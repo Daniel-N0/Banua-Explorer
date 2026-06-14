@@ -1,6 +1,7 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import android.widget.Toast
+import coil.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.layout.ContentScale
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
@@ -343,7 +345,14 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
                     val destination = destinations[index]
                     Card(modifier = Modifier.width(220.dp).clickable { onDestinationClick(destination) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                         Column {
-                            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(MaterialTheme.colorScheme.primary))
+                            AsyncImage(
+                                model = destination.imageUrl, // Ngambil langsung dari data class lu
+                                contentDescription = destination.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp),
+                                contentScale = ContentScale.Crop // Biar gambar rapi
+                            )
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(destination.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.height(4.dp))

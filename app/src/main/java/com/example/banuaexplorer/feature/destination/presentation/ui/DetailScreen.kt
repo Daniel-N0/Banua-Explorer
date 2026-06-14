@@ -1,9 +1,11 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +50,7 @@ fun DetailScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     val averageRating = if (reviews.isNotEmpty()) reviews.sumOf { it.rating } / reviews.size else 0.0
     val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
+    var selectedImage by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundGray)) {
 // --- 1. GAMBAR BACKGROUND (HEADER) ---
@@ -161,17 +165,22 @@ fun DetailScreen(
                     Text("Galeri Foto", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(4) {
-                            Box(
+                        // Kita looping berdasarkan data yang dibawa destinasi itu
+                        items(destination.galleryUrls) { url ->
+                            AsyncImage(
+                                model = url, // Ambil URL dinamis dari database
+                                contentDescription = "Foto Destinasi",
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.Image, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
+                                    .clickable { selectedImage = url }, // Saat diklik, URL-nya yang masuk state
+                                contentScale = ContentScale.Crop
+                            )
                         }
+                    }
+
+                    if (selectedImage != null) {
+                        PhotoDetailScreen(imageUrl = selectedImage!!) { selectedImage = null }
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))

@@ -117,7 +117,7 @@ fun MainScreen(
                     Image(
                         painter = painterResource(id = R.drawable.banua_explorer), // Pakai nama file yang baru
                         contentDescription = "Logo Banua Explorer",
-                        modifier = Modifier.size(500.dp) // Ukuran logonya, bisa lu gede-kecilin
+                        modifier = Modifier.size(300.dp) // Ukuran logonya, bisa lu gede-kecilin
                     )
                 }
             }

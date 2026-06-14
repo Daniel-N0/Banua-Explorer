@@ -32,8 +32,10 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.banuaexplorer.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +45,7 @@ fun LoginScreen(
     onForgotPasswordClick: (String) -> Unit
 ) {
     val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFF8F9FA)
+    val backgroundGray = Color(0xFFFFFFFF)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -60,18 +62,18 @@ fun LoginScreen(
         // --- LOGO ATAU ICON APLIKASI ---
         Box(
             modifier = Modifier
-                .size(100.dp)
-                .background(
-                    banuaGreen.copy(alpha = 0.1f),
-                    androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
-                ),
+                .size(150.dp),
             contentAlignment = Alignment.Center
         ) {
             // Nanti bisa diganti pakai Image logo asli BanuaExplorer
-            Text("BE", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold, color = banuaGreen)
+            Image(
+                painter = painterResource(id = R.drawable.banua_explorer), // Pakai nama file yang baru
+                contentDescription = "Logo Banua Explorer",
+                modifier = Modifier.size(150.dp) // Ukuran logonya, bisa lu gede-kecilin
+            )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         // --- JUDUL ---
         Text(
