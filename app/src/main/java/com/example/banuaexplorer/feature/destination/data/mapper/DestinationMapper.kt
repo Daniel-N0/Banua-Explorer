@@ -34,6 +34,7 @@ fun DestinationEntity.toDomain(): Destination {
         imageUrl = imageUrl,
         category = category,
         rating = rating,
-        reviewCount = reviewCount
+        reviewCount = reviewCount,
+        galleryUrls = emptyList()
     )
 }
