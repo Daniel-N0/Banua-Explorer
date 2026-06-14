@@ -52,4 +52,5 @@ class DestinationUseCase(private val repository: DestinationRepository) {
     }
 
 
+    suspend fun deleteReview(review: Review) = repository.deleteReview(review)
 }

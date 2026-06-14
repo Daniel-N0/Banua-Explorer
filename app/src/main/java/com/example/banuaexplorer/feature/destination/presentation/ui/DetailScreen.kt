@@ -45,6 +45,8 @@ fun DetailScreen(
     var showDialog by remember { mutableStateOf(false) }
     var editingReview by remember { mutableStateOf<Review?>(null) }
     val context = androidx.compose.ui.platform.LocalContext.current
+    val averageRating = if (reviews.isNotEmpty()) reviews.sumOf { it.rating } / reviews.size else 0.0
+    val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundGray)) {
 // --- 1. GAMBAR BACKGROUND (HEADER) ---
@@ -125,7 +127,7 @@ fun DetailScreen(
                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFF9800), modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = if (destination.rating > 0) "${destination.rating}/5" else "5/5",
+                                    text = "$formattedRating/5", // <--- SEKARANG SINKRON 100%
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -204,17 +206,30 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(40.dp))
 
                     // --- BAGIAN ULASAN (BREAD) ---
+                    // Logika hitung rata-rata rating dinamis
+                    val averageRating = if (reviews.isNotEmpty()) reviews.sumOf { it.rating } / reviews.size else 0.0
+                    val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("4.6", fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
+                            // Angka Rating Dinamis
+                            Text(formattedRating, fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Row {
-                                    repeat(5) { Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(14.dp)) }
+                                    // Bintang Global Dinamis
+                                    for (i in 1..5) {
+                                        Icon(
+                                            imageVector = Icons.Default.Star,
+                                            contentDescription = null,
+                                            tint = if (i <= kotlin.math.round(averageRating).toInt()) Color(0xFFFFC107) else Color.LightGray,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                    }
                                 }
                                 Text("${reviews.size} ULASAN", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
                             }
@@ -330,18 +345,20 @@ fun DetailScreen(
     if (showDialog) {
         ReviewInputDialog(
             initialText = editingReview?.comment ?: "",
+            initialRating = editingReview?.rating ?: 5.0, // <-- Lempar rating lama kalau lagi mode Edit
             onDismiss = { showDialog = false },
-            onSubmit = { comment ->
+            onSubmit = { ratingResult, commentResult ->  // <-- Nangkep Bintang & Teks
                 val finalReview = editingReview?.copy(
-                    comment = comment,
+                    rating = ratingResult, // <-- Update bintang
+                    comment = commentResult,
                     timestamp = System.currentTimeMillis()
                 ) ?: Review(
-                    id = UUID.randomUUID().toString(),
+                    id = java.util.UUID.randomUUID().toString(),
                     destinationId = destination.id,
                     userName = "Anda",
                     userAvatarUrl = "",
-                    rating = 5.0,
-                    comment = comment,
+                    rating = ratingResult, // <-- Simpan bintang baru
+                    comment = commentResult,
                     timestamp = System.currentTimeMillis()
                 )
                 onSaveReview(finalReview)
@@ -381,25 +398,80 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
                     Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), modifier = Modifier.size(18.dp).clickable { onDelete() })
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // --- INI TAMBAHAN BINTANG TIAP USER ---
+            Row {
+                for (i in 1..5) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = if (i <= review.rating.toInt()) Color(0xFFFFC107) else Color.LightGray,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
             Text(text = review.comment, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, lineHeight = 20.sp)
         }
     }
 }
 
 @Composable
-fun ReviewInputDialog(initialText: String, onDismiss: () -> Unit, onSubmit: (String) -> Unit) {
+fun ReviewInputDialog(
+    initialText: String,
+    initialRating: Double = 5.0, // <-- Tambahan: Rating bawaan
+    onDismiss: () -> Unit,
+    onSubmit: (Double, String) -> Unit // <-- Tambahan: Balikin Rating & Teks
+) {
     var text by remember { mutableStateOf(initialText) }
+    var rating by remember { mutableDoubleStateOf(initialRating) } // <-- State buat bintang
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (initialText.isEmpty()) "Tulis Ulasan" else "Edit Ulasan", fontWeight = FontWeight.Bold) },
         text = {
-            OutlinedTextField(
-                value = text, onValueChange = { text = it }, placeholder = { Text("Bagaimana pengalamanmu di sini?") },
-                modifier = Modifier.fillMaxWidth(), minLines = 3, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF005959))
-            )
+            Column {
+                // --- BARISAN BINTANG KLIKABLE ---
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    for (i in 1..5) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Star $i",
+                            tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clickable { rating = i.toDouble() }
+                                .padding(4.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                // --- KOTAK TEKS ---
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    placeholder = { Text("Bagaimana pengalamanmu di sini?") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF005959))
+                )
+            }
         },
-        confirmButton = { Button(onClick = { onSubmit(text) }, enabled = text.isNotBlank(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("Simpan") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) } }
+        confirmButton = {
+            Button(
+                onClick = { onSubmit(rating, text) }, // <-- Kirim Rating dan Teks
+                enabled = text.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) { Text("Simpan") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Batal", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) }
+        }
     )
 }

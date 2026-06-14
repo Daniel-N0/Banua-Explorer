@@ -18,6 +18,7 @@ import com.example.banuaexplorer.feature.destination.data.local.entity.toEntity
 import com.example.banuaexplorer.feature.destination.data.mapper.toFavoriteEntity
 import com.example.banuaexplorer.feature.destination.data.mapper.toDomainModel
 
+
 class DestinationRepositoryImpl(
     private val destinationDao: DestinationDao,
     private val partnerDao: PartnerDao,
@@ -61,9 +62,6 @@ class DestinationRepositoryImpl(
         reviewDao.insertReview(review.toEntity())
     }
 
-    override suspend fun deleteReview(review: Review) {
-        reviewDao.deleteReview(review.toEntity())
-    }
 
     // --- Favorite / Favorit (BARU) ---
     override fun getLocalFavorites(): Flow<List<Destination>> {
@@ -78,5 +76,19 @@ class DestinationRepositoryImpl(
 
     override suspend fun removeFavorite(destination: Destination) {
         favoriteDao.deleteFavorite(destination.toFavoriteEntity())
+    }
+
+    override fun getReviews(destId: String): Flow<List<Review>> {
+        return reviewDao.getReviewsByDestination(destId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun addReview(review: Review) {
+        reviewDao.insertReview(review.toEntity())
+    }
+
+    override suspend fun deleteReview(review: Review) {
+        reviewDao.deleteReview(review.toEntity())
     }
 }

@@ -2,7 +2,7 @@ package com.example.banuaexplorer.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.banuaexplorer.feature.auth.domain.usecase.AuthUseCase
+import com.example.banuaexplorer.feature.destination.domain.usecase.AuthUseCase
 import com.example.banuaexplorer.feature.destination.data.local.AppDatabase
 import com.example.banuaexplorer.feature.destination.data.remote.api.DestinationApi
 import com.example.banuaexplorer.feature.destination.data.remote.api.PartnerApi

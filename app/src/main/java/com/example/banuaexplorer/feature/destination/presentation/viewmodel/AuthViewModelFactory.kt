@@ -2,7 +2,7 @@ package com.example.banuaexplorer.feature.destination.presentation.viewmodel // 
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.banuaexplorer.feature.auth.domain.usecase.AuthUseCase
+import com.example.banuaexplorer.feature.destination.domain.usecase.AuthUseCase
 import kotlin.jvm.java
 
 class AuthViewModelFactory(

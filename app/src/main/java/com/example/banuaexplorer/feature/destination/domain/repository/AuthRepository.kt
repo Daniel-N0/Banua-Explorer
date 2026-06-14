@@ -1,6 +1,6 @@
 package com.example.banuaexplorer.feature.auth.domain.repository
 
-import com.example.banuaexplorer.feature.auth.domain.model.User
+import com.example.banuaexplorer.feature.destination.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

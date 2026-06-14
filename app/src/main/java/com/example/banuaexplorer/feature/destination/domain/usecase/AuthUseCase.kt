@@ -1,6 +1,6 @@
-package com.example.banuaexplorer.feature.auth.domain.usecase
+package com.example.banuaexplorer.feature.destination.domain.usecase
 
-import com.example.banuaexplorer.feature.auth.domain.model.User
+import com.example.banuaexplorer.feature.destination.domain.model.User
 import com.example.banuaexplorer.feature.auth.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlin.text.isBlank

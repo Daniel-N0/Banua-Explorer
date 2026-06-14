@@ -7,8 +7,8 @@ import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 // Pastikan import User dan AuthUseCase sesuai dengan folder tempat kamu menyimpannya
-import com.example.banuaexplorer.feature.auth.domain.model.User
-import com.example.banuaexplorer.feature.auth.domain.usecase.AuthUseCase
+import com.example.banuaexplorer.feature.destination.domain.model.User
+import com.example.banuaexplorer.feature.destination.domain.usecase.AuthUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.flow.MutableStateFlow

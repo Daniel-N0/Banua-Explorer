@@ -1,6 +1,6 @@
 package com.example.banuaexplorer.feature.destination.data.repository // <--- Package udah disesuaikan!
 
-import com.example.banuaexplorer.feature.auth.domain.model.User // <-- Pastikan import model User-mu benar
+import com.example.banuaexplorer.feature.destination.domain.model.User // <-- Pastikan import model User-mu benar
 import com.example.banuaexplorer.feature.auth.domain.repository.AuthRepository // <-- Pastikan import AuthRepository-mu benar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
