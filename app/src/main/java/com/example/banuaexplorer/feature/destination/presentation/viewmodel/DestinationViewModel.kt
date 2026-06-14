@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
+
+
 data class UserProfile(
     val name: String = "Muhammad Ilham",
     val email: String = "ilham@banua.id",
@@ -274,9 +277,6 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
         viewModelScope.launch { useCase.addReview(review) }
     }
 
-    fun deleteReview(review: Review) {
-        viewModelScope.launch { useCase.removeReview(review) }
-    }
 
     fun toggleFavorite(destination: Destination) {
         val currentFavorites = _favoriteDestinations.value.toMutableList()
@@ -320,5 +320,25 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
         _userProfile.value = _userProfile.value.copy(
             name = name, email = email, phone = phone, city = city, photoUri = photoUri
         )
+    }
+
+    // =========================================
+    // FITUR BREAD REVIEW
+    // =========================================
+
+    fun getReviews(destinationId: String): kotlinx.coroutines.flow.Flow<List<com.example.banuaexplorer.feature.destination.domain.model.Review>> {
+        return useCase.getReviews(destId = destinationId)
+    }
+
+    fun addReview(review: com.example.banuaexplorer.feature.destination.domain.model.Review) {
+        viewModelScope.launch {
+            useCase.addReview(review)
+        }
+    }
+
+    fun deleteReview(review: com.example.banuaexplorer.feature.destination.domain.model.Review) {
+        viewModelScope.launch {
+            useCase.deleteReview(review)
+        }
     }
 }

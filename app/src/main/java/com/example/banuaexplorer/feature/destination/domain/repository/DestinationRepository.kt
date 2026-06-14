@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import com.example.banuaexplorer.feature.destination.domain.model.Review
 
 
+
 interface DestinationRepository {
     fun getDestinationsFromLocal(): Flow<List<Destination>>
     suspend fun refreshDestinations(): Result<Unit>
@@ -21,4 +22,8 @@ interface DestinationRepository {
     fun getLocalFavorites(): Flow<List<Destination>>
     suspend fun saveFavorite(destination: Destination)
     suspend fun removeFavorite(destination: Destination)
+    fun getReviews(destId: String): Flow<List<Review>>
+    suspend fun addReview(review: Review)
+
+
 }

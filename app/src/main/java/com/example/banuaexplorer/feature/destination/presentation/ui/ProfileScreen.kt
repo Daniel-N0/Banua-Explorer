@@ -1,5 +1,9 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,10 +31,35 @@ import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 
 @Composable
-fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}, onEditProfileClick: () -> Unit = {}, onLanguageClick: () -> Unit = {}, onLogoutClick: () -> Unit = {}, isDarkMode: Boolean = false, onDarkModeChange: (Boolean) -> Unit = {}) {
-    val profile by viewModel.userProfile.collectAsState()
+fun ProfileScreen(
+    viewModel: DestinationViewModel,
+    onBackClick: () -> Unit = {},
+    onEditProfileClick: () -> Unit = {},
+    onLanguageClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {},
+    isDarkMode: Boolean = false,
+    onDarkModeChange: (Boolean) -> Unit = {},
+    onPhotoSelected: (Uri) -> Unit = {},
+    // --- 3 PARAMETER BARU BUAT NANGKEP DATA FIREBASE ---
+    userName: String = "Petualang",
+    userEmail: String = "",
+    profilePictureUrl: String = ""
+) {
 
-    // State untuk Switch Mode Gelap
+    // (State viewModel.userProfile dihapus karena kita pakai data dari Firebase sekarang)
+
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            selectedImageUri = uri
+            onPhotoSelected(uri) // Memicu upload ke Cloudinary di MainScreen
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -38,7 +67,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp)
     ) {
-        // --- HEADER ---
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,58 +80,84 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable { onBackClick() }
             )
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Text(
                 text = "Profil Saya",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color =  MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
-        // --- INFO PROFIL (Foto, Nama, Email) ---
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Box untuk Avatar & Icon Edit
-            Box(contentAlignment = Alignment.BottomEnd) {
-                // Lingkaran Avatar
+
+            Box(
+                contentAlignment = Alignment.BottomEnd
+            ) {
+
                 Box(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable {
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (profile.photoUri != null) {
-                        AsyncImage(
-                            model = profile.photoUri,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Avatar",
-                            modifier = Modifier.size(60.dp),
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
+
+                    when {
+                        // 1. Prioritaskan gambar yang baru dipilih dari galeri (Biar kelihatan instan)
+                        selectedImageUri != null -> {
+                            AsyncImage(
+                                model = selectedImageUri,
+                                contentDescription = "Foto Profil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        // 2. Kalau gak ada, pakai gambar dari Link Cloudinary/Firebase
+                        profilePictureUrl.isNotBlank() -> {
+                            AsyncImage(
+                                model = profilePictureUrl,
+                                contentDescription = "Foto Profil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                        // 3. Kalau akun baru dan belum ada foto, kasih ikon default
+                        else -> {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Avatar",
+                                modifier = Modifier.size(60.dp),
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
                     }
                 }
 
-                // Badge Icon Edit Hijau
                 Surface(
-                    color =  MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
                     modifier = Modifier
                         .padding(bottom = 4.dp, end = 4.dp)
                         .size(32.dp)
                         .clickable {
-                            onEditProfileClick()
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
                         }
                 ) {
                     Icon(
@@ -112,24 +167,21 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                         modifier = Modifier
                             .padding(6.dp)
                             .size(16.dp)
-                            .clickable {
-                                onEditProfileClick()
-                            }
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Teks Nama & Email
             Text(
-                text = profile.name,
+                text = userName, // <-- Diubah pakai data Firebase
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
+
             Text(
-                text = profile.email,
+                text = userEmail, // <-- Diubah pakai data Firebase
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
@@ -137,29 +189,36 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- MENU CARD ---
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
+
+            Column(
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+
                 ProfileMenuItem(
                     icon = Icons.Outlined.Person,
                     title = "Edit Profil",
                     showArrow = true,
                     onClick = onEditProfileClick
                 )
+
                 ProfileMenuItem(
-                    icon = Icons.Outlined.Language, // Icon Bola Dunia yang bener!
+                    icon = Icons.Outlined.Language,
                     title = "Ganti Bahasa",
                     trailingText = "Indonesia",
                     showArrow = true,
                     onClick = onLanguageClick
                 )
+
                 ProfileMenuItem(
-                    icon = Icons.Outlined.DarkMode, // Icon Bulan Sabit yang pas!
+                    icon = Icons.Outlined.DarkMode,
                     title = "Mode Gelap",
                     isSwitch = true,
                     switchState = isDarkMode,
@@ -170,27 +229,30 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- TOMBOL KELUAR (LOGOUT) ---
         Surface(
-            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f), // Merah super muda
+            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onLogoutClick() }
         ) {
+
             Row(
                 modifier = Modifier.padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = "Keluar",
-                    tint = MaterialTheme.colorScheme.error // Merah tegas
+                    tint = MaterialTheme.colorScheme.error
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    text = "Keluar",
+                    text = "Logout",
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 16.sp
@@ -200,7 +262,6 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
     }
 }
 
-// --- KOMPONEN BANTUAN UNTUK ITEM MENU ---
 @Composable
 fun ProfileMenuItem(
     icon: ImageVector,
@@ -212,36 +273,42 @@ fun ProfileMenuItem(
     onSwitchChange: (Boolean) -> Unit = {},
     onClick: () -> Unit = {}
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .then(
                 if (!isSwitch)
                     Modifier.clickable { onClick() }
-                else
-                    Modifier
+                else Modifier
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Bagian Kiri: Icon background bulat + Teks
+
         Row(verticalAlignment = Alignment.CenterVertically) {
+
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), // Hijau sangat transparan
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
+
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint =  MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
+
             Spacer(modifier = Modifier.width(16.dp))
+
             Text(
                 text = title,
                 fontWeight = FontWeight.Medium,
@@ -250,32 +317,37 @@ fun ProfileMenuItem(
             )
         }
 
-        // Bagian Kanan: Teks Tambahan / Switch / Panah Kanan
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (trailingText != null) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            trailingText?.let {
                 Text(
-                    text = trailingText,
+                    text = it,
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
             }
+
             if (isSwitch) {
+
                 Switch(
                     checked = switchState,
                     onCheckedChange = onSwitchChange,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.surface,
-                        checkedTrackColor =  MaterialTheme.colorScheme.primary // Hijau kalau nyala
-                    ),
-                    modifier = Modifier.height(24.dp)
+                        checkedTrackColor = MaterialTheme.colorScheme.primary
+                    )
                 )
+
             } else if (showArrow) {
+
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Detail",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                    modifier = Modifier.size(20.dp)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 )
             }
         }

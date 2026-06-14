@@ -11,7 +11,6 @@ plugins {
 val localProperties = Properties()
 localProperties.load(rootProject.file("local.properties").inputStream())
 
-
 android {
     namespace = "com.example.banuaexplorer"
     compileSdk = 36
@@ -77,8 +76,14 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // --- FIREBASE (Gabungan) ---
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth") // Fitur Lu
+
+    // --- CLOUDINARY ---
+    implementation("com.cloudinary:cloudinary-android:2.5.0") // Fitur Lu
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
@@ -97,6 +102,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-
+    // --- DATASTORE (DARK MODE) ---
+    implementation("androidx.datastore:datastore-preferences:1.1.1") // Fitur Daniel
 }
