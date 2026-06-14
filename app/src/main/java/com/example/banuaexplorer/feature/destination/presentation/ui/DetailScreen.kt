@@ -38,8 +38,8 @@ fun DetailScreen(
     onSaveReview: (Review) -> Unit,
     onDeleteReview: (Review) -> Unit
 ) {
-    val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFF8F9FA)
+    val banuaGreen = MaterialTheme.colorScheme.primary
+    val backgroundGray = MaterialTheme.colorScheme.background
     val scrollState = rememberScrollState()
 
     var showDialog by remember { mutableStateOf(false) }
@@ -83,7 +83,7 @@ fun DetailScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                color = Color.White
+                color = MaterialTheme.colorScheme.surface
             ) {
                 Column(
                     modifier = Modifier
@@ -102,13 +102,13 @@ fun DetailScreen(
                                 text = destination.name,
                                 fontSize = 26.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = Color(0xFF001F1F),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 lineHeight = 32.sp
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = destination.kabupaten.uppercase(),
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -116,7 +116,7 @@ fun DetailScreen(
 
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFFFFF3E0)
+                            color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -128,7 +128,7 @@ fun DetailScreen(
                                     text = if (destination.rating > 0) "${destination.rating}/5" else "5/5",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
-                                    color = Color(0xFFE65100)
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                         }
@@ -149,14 +149,14 @@ fun DetailScreen(
                     Text(
                         text = destination.description,
                         fontSize = 14.sp,
-                        color = Color.DarkGray,
+                        color = MaterialTheme.colorScheme.onSurface,
                         lineHeight = 22.sp
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // --- GALERI FOTO ---
-                    Text("Galeri Foto", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF001F1F))
+                    Text("Galeri Foto", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         items(4) {
@@ -164,10 +164,10 @@ fun DetailScreen(
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(Color(0xFFE0E0E0)),
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Image, contentDescription = null, tint = Color.Gray)
+                                Icon(Icons.Default.Image, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -210,13 +210,13 @@ fun DetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("4.6", fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF001F1F))
+                            Text("4.6", fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Row {
                                     repeat(5) { Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(14.dp)) }
                                 }
-                                Text("${reviews.size} ULASAN", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+                                Text("${reviews.size} ULASAN", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
                             }
                         }
 
@@ -235,7 +235,7 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (reviews.isEmpty()) {
-                        Text("Belum ada ulasan. Jadilah yang pertama!", color = Color.Gray, modifier = Modifier.padding(vertical = 16.dp))
+                        Text("Belum ada ulasan. Jadilah yang pertama!", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(vertical = 16.dp))
                     } else {
                         reviews.forEach { review ->
                             ReviewCardUI(
@@ -253,7 +253,7 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // --- VIDEO RELEVAN ---
-                    Text("Video Relevan", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF001F1F))
+                    Text("Video Relevan", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         items(3) {
@@ -265,8 +265,8 @@ fun DetailScreen(
                                     .background(Color.DarkGray),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Surface(shape = CircleShape, color = Color.White.copy(alpha = 0.8f), modifier = Modifier.size(40.dp)) {
-                                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black, modifier = Modifier.padding(8.dp))
+                                Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), modifier = Modifier.size(40.dp)) {
+                                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(8.dp))
                                 }
                             }
                         }
@@ -354,7 +354,7 @@ fun DetailScreen(
 @Composable
 fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
     val isCurrentUser = review.userName == "Anda"
-    val bgColor = if (isCurrentUser) Color(0xFFF0F4FF) else Color.White
+    val bgColor = if (isCurrentUser) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -365,24 +365,24 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Box(
-                    modifier = Modifier.size(40.dp).clip(CircleShape).background(if (isCurrentUser) Color(0xFF005959) else Color.Gray),
+                    modifier = Modifier.size(40.dp).clip(CircleShape).background(if (isCurrentUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(review.userName.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(review.userName.take(1).uppercase(), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = review.userName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text(text = "Baru saja", fontSize = 11.sp, color = Color.Gray)
+                    Text(text = review.userName, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "Baru saja", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
                 if (isCurrentUser) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF005959), modifier = Modifier.size(18.dp).clickable { onEdit() })
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp).clickable { onEdit() })
                     Spacer(modifier = Modifier.width(12.dp))
-                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Color.Red.copy(alpha = 0.7f), modifier = Modifier.size(18.dp).clickable { onDelete() })
+                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), modifier = Modifier.size(18.dp).clickable { onDelete() })
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = review.comment, fontSize = 13.sp, color = Color.DarkGray, lineHeight = 20.sp)
+            Text(text = review.comment, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, lineHeight = 20.sp)
         }
     }
 }
@@ -399,7 +399,7 @@ fun ReviewInputDialog(initialText: String, onDismiss: () -> Unit, onSubmit: (Str
                 modifier = Modifier.fillMaxWidth(), minLines = 3, colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF005959))
             )
         },
-        confirmButton = { Button(onClick = { onSubmit(text) }, enabled = text.isNotBlank(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF005959))) { Text("Simpan") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = Color.Gray) } }
+        confirmButton = { Button(onClick = { onSubmit(text) }, enabled = text.isNotBlank(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) { Text("Simpan") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) } }
     )
 }
