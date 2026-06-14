@@ -21,20 +21,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.banuaexplorer.feature.destination.domain.model.Destination
-import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.layout.ContentScale
+import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
-import androidx.compose.ui.text.style.TextOverflow
-
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import java.util.Calendar
+import java.util.Locale
+import java.text.SimpleDateFormat
 
 @Composable
 fun HomeScreen(
     viewModel: DestinationViewModel,
     onDestinationClick: (Destination) -> Unit,
     onProfileClick: () -> Unit,
+    onAmbassadorClick: (String) -> Unit,
+    onSeeAllClick: () -> Unit
     onAmbassadorClick: () -> Unit,
     onSeeAllClick: () -> Unit // <-- 1. TAMBAHKAN INI
 ) {
@@ -46,32 +51,13 @@ fun HomeScreen(
     // --- STATE UNTUK FILTER, PENCARIAN, DAN KATEGORI ---
     var searchQuery by remember { mutableStateOf("") }
     var selectedRegion by remember { mutableStateOf("Kalimantan Selatan") }
-    var selectedCategory by remember { mutableStateOf<String?>(null) } // <-- State baru untuk Kategori
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
 
-    // --- LOGIKA FILTER CERDAS (Mencakup ke-3 filter sekaligus) ---
+    // --- LOGIKA FILTER CERDAS ---
     val filteredDestinations = destinations.filter { destination ->
-        // 1. Filter Wilayah
-        val matchRegion = if (selectedRegion == "Kalimantan Selatan") {
-            true
-        } else {
-            destination.kabupaten.contains(selectedRegion, ignoreCase = true)
-        }
-
-        // 2. Filter Pencarian
-        val matchSearch = if (searchQuery.isEmpty()) {
-            true
-        } else {
-            destination.name.contains(searchQuery, ignoreCase = true)
-        }
-
-        // 3. Filter Kategori
-        // PENTING: Pastikan di model data 'Destination' kamu sudah ada variabel 'kategori'
-        val matchCategory = if (selectedCategory == null) {
-            true
-        } else {
-            // Ganti 'kategori' dengan nama variabel di modelmu jika beda (misal: 'category')
-            destination.category.equals(selectedCategory, ignoreCase = true)
-        }
+        val matchRegion = if (selectedRegion == "Kalimantan Selatan") true else destination.kabupaten.contains(selectedRegion, ignoreCase = true)
+        val matchSearch = if (searchQuery.isEmpty()) true else destination.name.contains(searchQuery, ignoreCase = true)
+        val matchCategory = if (selectedCategory == null) true else destination.category.equals(selectedCategory, ignoreCase = true)
 
         matchRegion && matchSearch && matchCategory
     }
@@ -79,7 +65,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background) // Adaptif Dark Mode Daniel
     ) {
         Column(
             modifier = Modifier
@@ -89,11 +75,9 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(240.dp))
 
-            //  Oper state Kategori ke komponen UI-nya
             CategorySection(
                 selectedCategory = selectedCategory,
                 onCategoryClick = { category ->
-                    // Logika Toggle: Kalau diklik lagi kategori yang sama, filter dibatalkan
                     selectedCategory = if (selectedCategory == category) null else category
                 }
             )
@@ -102,8 +86,8 @@ fun HomeScreen(
 
             DestinationRecommendationSection(
                 destinations = filteredDestinations,
-                onDestinationClick = onDestinationClick ,
-                onSeeAllClick = onSeeAllClick // <-- 2. TAMBAHKAN INI
+                onDestinationClick = onDestinationClick,
+                onSeeAllClick = onSeeAllClick
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -147,7 +131,6 @@ fun HomeHeader(
     selectedRegion: String,
     onRegionChange: (String) -> Unit
 ) {
-    // Daftar 13 Kabupaten/Kota + Provinsi
     val regions = listOf(
         "Kalimantan Selatan", "Banjarmasin", "Banjarbaru", "Banjar",
         "Barito Kuala", "Tapin", "Hulu Sungai Selatan", "Hulu Sungai Tengah",
@@ -156,11 +139,21 @@ fun HomeHeader(
     )
     var expanded by remember { mutableStateOf(false) }
 
+    // Logika Firebase Lu
+    val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+    val fullName = currentUser?.displayName ?: "Petualang"
+    val profilePhotoUrl = currentUser?.photoUrl?.toString() ?: ""
+    val firstName = fullName.split(" ").firstOrNull() ?: "Petualang"
+
+    // Logika Waktu Lu
+    val greetingTime = getGreetingMessage()
+    val todayDate = getCurrentDate()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.primary) // Adaptif Dark Mode
     ) {
         Column(
             modifier = Modifier
@@ -173,31 +166,37 @@ fun HomeHeader(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Selamat Malam, Ganteng!", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                    Text("Jumat, 12 Juni 2026", color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 12.sp)
+                    // Teks Dinamis Lu dibalut Warna Daniel
+                    Text(
+                        text = "$greetingTime, $firstName!",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text(
+                        text = todayDate,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // --- SISTEM DROPDOWN FILTER WILAYAH ---
+                    // Dropdown Wilayah
                     Box {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .clickable { expanded = true }
                                 .padding(vertical = 4.dp)
-                                // Opsional: tambah fillMaxWidth di dalam klik ini agar area sentuhnya luas
                                 .fillMaxWidth()
                         ) {
                             Text(
                                 text = "Jelajahi wisata di $selectedRegion",
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold,
-                                // 1. TURUNKAN FONT SIZE JADI 15.sp ATAU 14.sp
                                 fontSize = 15.sp,
                                 maxLines = 1,
-                                // 2. WAJIB: Kasih weight biar teks ngambil sisa ruang tapi ngalah sama Icon
                                 modifier = Modifier.weight(1f),
-                                // 3. WAJIB: Kasih Ellipsis buat jaga-jaga kalau di HP layar kecil banget
                                 overflow = TextOverflow.Ellipsis
                             )
                             Icon(
@@ -225,6 +224,7 @@ fun HomeHeader(
                     }
                 }
 
+                // Foto Profil Dinamis Lu dibalut Warna Daniel
                 Box(
                     modifier = Modifier
                         .padding(start = 16.dp)
@@ -234,13 +234,27 @@ fun HomeHeader(
                         .clickable { onProfileIconClick() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("I", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    if (profilePhotoUrl.isNotBlank()) {
+                        coil.compose.AsyncImage(
+                            model = profilePhotoUrl,
+                            contentDescription = "Profil",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            text = firstName.take(1).uppercase(),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- SISTEM PENCARIAN ---
+            // Pencarian
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
@@ -262,7 +276,6 @@ fun HomeHeader(
     }
 }
 
-// ... [KODE CATEGORY SECTION TETAP SAMA] ...
 @Composable
 fun CategorySection(
     selectedCategory: String?,
@@ -277,17 +290,14 @@ fun CategorySection(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         categories.forEach { category ->
-            // Cek apakah kategori ini sedang aktif ditekan
             val isSelected = category == selectedCategory
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                // Sensor klik untuk memilih kategori
                 modifier = Modifier.clickable { onCategoryClick(category) }
             ) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    // Ganti warna latar kalau terpilih
                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                     shadowElevation = 2.dp,
                     modifier = Modifier.size(56.dp)
@@ -295,7 +305,6 @@ fun CategorySection(
                     Box(contentAlignment = Alignment.Center) {
                         Text(
                             text = category.take(1),
-                            // Ganti warna huruf kalau terpilih
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp
@@ -306,7 +315,6 @@ fun CategorySection(
                 Text(
                     text = category,
                     fontSize = 12.sp,
-                    // Huruf jadi lebih tebal kalau terpilih
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -315,7 +323,6 @@ fun CategorySection(
     }
 }
 
-// ... [KODE DESTINATION RECOMMENDATION SECTION TETAP SAMA] ...
 @Composable
 fun DestinationRecommendationSection(destinations: List<Destination>, onDestinationClick: (Destination) -> Unit, onSeeAllClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -326,10 +333,7 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable {
-                    // Panggil navigasi ke halaman baru
-                    onSeeAllClick()
-                }
+                modifier = Modifier.clickable { onSeeAllClick() }
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -360,7 +364,6 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
     }
 }
 
-// ... [KODE EVENT BANNER SECTION & EVENT CARD TETAP SAMA] ...
 @Composable
 fun EventBannerSection() {
     val dummyEvents = listOf(
@@ -389,14 +392,13 @@ fun EventCard(event: EventItem) {
                 Text(text = event.location, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.tertiary) {
-                Text(text = event.status, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+            Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFC107)) {
+                Text(text = event.status, color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
             }
         }
     }
 }
 
-//  INI YANG HILANG DAN BIKIN ERROR (Data struktur Event)
 data class EventItem(val title: String, val location: String, val status: String)
 
 @Composable
@@ -425,8 +427,8 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
                             Text(dummyPackages[index].first, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                             Text(dummyPackages[index].second, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp)) {
-                                Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                            Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp)) {
+                                Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                             }
                         }
                     }
@@ -458,6 +460,29 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
                 ) {
                     Box(modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    // --- NAMA DINAMIS ---
+                    Text(
+                        text = ambassador.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Surface(
+                        color = Color(0xFFFFC107),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Text(
+                            text = "DUTA",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
                     Text(text = ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                     Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
                         Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
@@ -466,4 +491,23 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
             }
         }
     }
+}
+
+// --- FUNGSI SENSOR WAKTU LU ---
+fun getGreetingMessage(): String {
+    val calendar = Calendar.getInstance()
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+
+    return when (hour) {
+        in 0..10 -> "Selamat Pagi"
+        in 11..14 -> "Selamat Siang"
+        in 15..17 -> "Selamat Sore"
+        else -> "Selamat Malam"
+    }
+}
+
+fun getCurrentDate(): String {
+    val localeID = Locale("id", "ID")
+    val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy", localeID)
+    return formatter.format(java.util.Date())
 }

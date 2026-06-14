@@ -300,7 +300,7 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
                 val ambassadorList = mutableListOf<Ambassador>()
                 for (document in result) {
                     val ambassador = Ambassador(
-                        id = document.getString("id") ?: "",
+                        id = document.id, // <--- UBAH JADI INI! Ini ngambil Document ID aslinya ("duta-001")
                         name = document.getString("name") ?: "Nama Duta",
                         bio = document.getString("bio") ?: "",
                         imageUrl = document.getString("imageUrl") ?: "",

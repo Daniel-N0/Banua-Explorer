@@ -29,6 +29,10 @@ import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.domain.model.Partner
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import com.example.banuaexplorer.ui.theme.BanuaGreen
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PartnerScreen(viewModel: DestinationViewModel) {
@@ -62,7 +66,7 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(Color(0xFFF8F9FA))
         ) {
             // Header Utama
             Row(
@@ -73,11 +77,11 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = BanuaGreen)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Partnership & Mitra", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                    Text("Partnership & Mitra", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
                 }
-                Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary)
+                Icon(Icons.Default.Search, contentDescription = "Search", tint = BanuaGreen)
             }
 
             // Konten Scrollable
@@ -90,10 +94,10 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
             ) {
                 item(span = { GridItemSpan(2) }) {
                     Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                        Text("COLLABORATIONS", color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text("COLLABORATIONS", color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Membangun Banua", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
-                        Text("Bersama Mitra", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
+                        Text("Membangun Banua", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFF001F1F))
+                        Text("Bersama Mitra", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = BanuaGreen)
                     }
                 }
 
@@ -103,8 +107,8 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Duta Daerah", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)
-                        Text("Lihat Semua", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                        Text("Duta Daerah", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text("Lihat Semua", color = BanuaGreen, fontSize = 12.sp)
                     }
                 }
 
@@ -135,7 +139,7 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
                 }
 
                 item(span = { GridItemSpan(2) }) {
-                    Text("Mitra & Sponsor", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+                    Text("Mitra & Sponsor", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
                 }
 
                 items(partners) { partner ->
@@ -161,7 +165,7 @@ fun DutaDetailGroupScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFFF8F9FA))
     ) {
         // Top Bar Navigasi Kembali
         Row(
@@ -173,11 +177,11 @@ fun DutaDetailGroupScreen(
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "Back",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = BanuaGreen,
                 modifier = Modifier.clickable { onBackClick() }
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
         }
 
         // Teks Pengantar
@@ -188,8 +192,8 @@ fun DutaDetailGroupScreen(
                 top = 0.dp,
                 bottom = 16.dp
             )) {
-            Text("DAFTAR ANGGOTA resmi", color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold, fontSize = 11.sp)
-            Text("Duta Pariwisata & Kebudayaan", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
+            Text("DAFTAR ANGGOTA resmi", color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            Text("Duta Pariwisata & Kebudayaan", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF001F1F))
         }
 
         // Grid Viewcard Perorangan Anggota
@@ -215,7 +219,7 @@ fun DutaDetailGroupScreen(
 @Composable
 fun IndividualAmbassadorCard(ambassador: Ambassador) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier.fillMaxWidth()
@@ -230,7 +234,7 @@ fun IndividualAmbassadorCard(ambassador: Ambassador) {
                 modifier = Modifier
                     .size(90.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .background(Color.LightGray),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -241,25 +245,24 @@ fun IndividualAmbassadorCard(ambassador: Ambassador) {
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
+                overflow = TextOverflow.Ellipsis
             )
 
             Text(
                 text = "${ambassador.followers} Followers",
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                color = Color.Gray,
                 modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
             )
 
             Surface(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = BanuaGreen.copy(alpha = 0.1f),
                 shape = CircleShape,
                 modifier = Modifier.clickable { }
             ) {
                 Text(
                     "Lihat Bio",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = BanuaGreen,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
@@ -273,7 +276,7 @@ fun IndividualAmbassadorCard(ambassador: Ambassador) {
 fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .width(310.dp)
@@ -284,10 +287,10 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () ->
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(Color.LightGray)
             ) {
                 Surface(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = BanuaGreen,
                     shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -295,7 +298,7 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () ->
                 ) {
                     Text(
                         text = badge,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = Color.White,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
@@ -303,9 +306,9 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () ->
                 }
             }
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(subtitle, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(subtitle, color = Color.Gray, fontSize = 12.sp)
             }
         }
     }
@@ -315,7 +318,7 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () ->
 fun SponsorCard(partner: Partner) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -332,12 +335,12 @@ fun SponsorCard(partner: Partner) {
                 modifier = Modifier
                     .size(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(Color(0xFF004D4D)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     partner.name.take(1),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
                 )
@@ -348,8 +351,7 @@ fun SponsorCard(partner: Partner) {
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 2,
-                color = MaterialTheme.colorScheme.onSurface
+                maxLines = 2
             )
         }
     }

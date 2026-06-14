@@ -12,5 +12,6 @@ data class Destination(
     val imageUrl: String,
     val category: String,
     val rating: Double,
-    val reviewCount: Int
+    val reviewCount: Int,
+    val galleryUrls: List<String>
 )

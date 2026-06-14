@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -117,7 +116,7 @@ fun MainScreen(
                     Image(
                         painter = painterResource(id = R.drawable.banua_explorer), // Pakai nama file yang baru
                         contentDescription = "Logo Banua Explorer",
-                        modifier = Modifier.size(500.dp) // Ukuran logonya, bisa lu gede-kecilin
+                        modifier = Modifier.size(300.dp) // Ukuran logonya, bisa lu gede-kecilin
                     )
                 }
             }
@@ -238,7 +237,25 @@ fun MainScreen(
             }
 
             composable(Screen.Map.route) { MapScreen(viewModel = viewModel) }
-            composable(Screen.Partner.route) { PartnerScreen(viewModel = viewModel) }
+            composable(Screen.Partner.route) {
+                PartnerScreen(
+                    viewModel = viewModel,
+                    onNavigateToDutaDetail = { id ->
+                        navController.navigate("duta_detail/$id") // <--- Navigasi bawa ID!
+                    }
+                )
+            }
+
+            // Tambahin ini di bawah composable rute-rute lu yang lain
+            composable("duta_detail/{dutaId}") { backStackEntry ->
+                // Tangkap ID yang dibawa dari rute
+                val id = backStackEntry.arguments?.getString("dutaId") ?: "duta-001"
+
+                DutaDetailScreen(
+                    ambassadorId = id, // <--- INI DIA YANG DITAGIH SAMA ANDROID STUDIO!
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
 
             // ==========================================
             // --- RUTE DETAIL DESTINASI ---
@@ -256,7 +273,8 @@ fun MainScreen(
                     id = "dummy_1", name = "Memuat...", kabupaten = "Memuat...",
                     description = "Memuat...", category = "Wisata", imageUrl = "",
                     latitude = 0.0, longitude = 0.0, dutaPick = "", facilities = "",
-                    rating = 0.0, reviewCount = 0
+                    rating = 0.0, reviewCount = 0, galleryUrls = emptyList()
+
                 )
 
                 // 2. Ambil data review dari database lokal (ROOM) via ViewModel
@@ -401,5 +419,6 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
         }
     }
 }
+
 
 data class NavItem(val title: String, val icon: ImageVector, val route: String)

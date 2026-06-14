@@ -119,7 +119,8 @@ fun AddEditScreen(
                         dutaPick = destination?.dutaPick ?: "",  // Diubah jadi String kosong
                         facilities = destination?.facilities ?: "", // Diubah jadi String kosong
                         rating = destination?.rating ?: 0.0,
-                        reviewCount = destination?.reviewCount ?: 0
+                        reviewCount = destination?.reviewCount ?: 0,
+                        galleryUrls = emptyList()
                     )
                     onSaveClick(newDest)
                 },

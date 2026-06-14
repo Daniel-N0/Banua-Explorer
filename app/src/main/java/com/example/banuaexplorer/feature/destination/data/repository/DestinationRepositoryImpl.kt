@@ -91,4 +91,6 @@ class DestinationRepositoryImpl(
     override suspend fun deleteReview(review: Review) {
         reviewDao.deleteReview(review.toEntity())
     }
+
+    
 }
