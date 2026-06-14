@@ -2,7 +2,7 @@ package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +16,7 @@ import java.util.UUID
 fun AddEditScreen(
     destination: Destination? = null, // Kalau null berarti tambah baru, kalau ada isinya berarti edit
     onBackClick: () -> Unit,
-    onSaveClick: (Destination) -> Unit
+    onSaveClick: (Destination) -> Unit,
 ) {
     // State untuk menampung ketikan form
     var name by remember { mutableStateOf(destination?.name ?: "") }
@@ -33,7 +33,7 @@ fun AddEditScreen(
                 title = { Text(if (isEditMode) "Edit Wisata" else "Tambah Wisata", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Batal")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Batal")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -86,7 +86,7 @@ fun AddEditScreen(
                 onClick = {
                     // Bungkus ketikan jadi object Destination baru
                     val newDest = Destination(
-                        id = destination?.id ?: java.util.UUID.randomUUID().toString(),
+                        id = destination?.id ?: UUID.randomUUID().toString(),
                         name = name,
                         kabupaten = kabupaten,
                         category = category,
