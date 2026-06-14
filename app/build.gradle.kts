@@ -77,12 +77,21 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // --- FIREBASE (Gabungan Firestore temen lu & Auth punya lu) ---
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth") // <--- TAMBAHAN LU
+
+    // --- CLOUDINARY (Upload Foto Profil) ---
+    implementation("com.cloudinary:cloudinary-android:2.5.0") // <--- TAMBAHAN LU
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+
+    // Coil udah ada dari temen lu, kita pakai yang ini aja (versi 2.7.0)
     implementation("io.coil-kt:coil-compose:2.7.0")
+
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.google.maps.android:maps-compose:4.3.3")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
@@ -96,5 +105,4 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
-
 }

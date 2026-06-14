@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.Modifier // <-- INI YANG BIKIN ERROR MODIFIER TADI
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.banuaexplorer.feature.destination.presentation.ui.MainScreen
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModelFactory
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModelFactory
 import com.example.banuaexplorer.ui.theme.BanuaExplorerTheme
@@ -19,26 +21,45 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
 
-    // PERBAIKAN FINAL: Ambil useCase dari AppContainer (Arsitektur Manual DI milikmu)
+    // ViewModel untuk Destinasi
     private val viewModel: DestinationViewModel by viewModels {
         val app = application as BanuaExplorerApplication
-        // Sesuaikan 'container' dengan nama variabel di BanuaExplorerApplication kamu (bisa 'container' atau 'appContainer')
         DestinationViewModelFactory(app.container.destinationUseCase)
+    }
+
+    // ViewModel untuk Authentication
+    private val authViewModel: AuthViewModel by viewModels {
+        val app = application as BanuaExplorerApplication
+        AuthViewModelFactory(app.container.authUseCase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inisialisasi Cloudinary
+        try {
+            val config = mapOf(
+                "cloud_name" to "dzftert5l"
+            )
+            com.cloudinary.android.MediaManager.init(this, config)
+        } catch (e: Exception) {
+            // Menghindari crash jika Cloudinary sudah terinisialisasi
+        }
+
         setContent {
             BanuaExplorerTheme {
 
-                // Mengontrol warna status bar dan nav bar sistem
+                // Mengatur warna status bar dan navigation bar
                 ManageSystemUI()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Transparent
                 ) {
-                    MainScreen(viewModel = viewModel)
+                    MainScreen(
+                        viewModel = viewModel,
+                        authViewModel = authViewModel
+                    )
                 }
             }
         }
@@ -48,17 +69,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ManageSystemUI() {
     val systemUiController = rememberSystemUiController()
-    val banuaGreen = Color(0xFF006666) // Warna hijau ciri khas BanuaExplorer
+    val banuaGreen = Color(0xFF006666)
     val isLightTheme = MaterialTheme.colorScheme.background.value == Color.White.value
 
     SideEffect {
-        // 1. Mewarnai Status Bar (Area Atas) menjadi Hijau Banua
+        // Status Bar
         systemUiController.setStatusBarColor(
             color = banuaGreen,
             darkIcons = false
         )
 
-        // 2. Mewarnai Navigation Bar (Area Bawah) menjadi Transparan murni
+        // Navigation Bar
         systemUiController.setNavigationBarColor(
             color = Color.Transparent,
             darkIcons = isLightTheme
