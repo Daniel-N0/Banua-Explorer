@@ -389,8 +389,8 @@ fun EventCard(event: EventItem) {
                 Text(text = event.location, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFC107)) {
-                Text(text = event.status, color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
+            Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.tertiary) {
+                Text(text = event.status, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
             }
         }
     }
@@ -425,8 +425,8 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
                             Text(dummyPackages[index].first, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                             Text(dummyPackages[index].second, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp)) {
-                                Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
+                            Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp)) {
+                                Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
                             }
                         }
                     }
@@ -459,8 +459,8 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
                     Box(modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
-                    Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                        Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                    Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+                        Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
                     }
                 }
             }

@@ -87,7 +87,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                         Text(
                             "YOUR FAVORITES",
-                            color = Color(0xFFF2C94C),
+                            color = MaterialTheme.colorScheme.tertiary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
                         )

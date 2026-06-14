@@ -54,7 +54,7 @@ fun DetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(350.dp)
-                .background(Color(0xFF2E8B57)),
+                .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
             // Menggunakan AsyncImage untuk memuat foto dari URL
@@ -124,7 +124,7 @@ fun DetailScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
-                                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFF9800), modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "$formattedRating/5", // <--- SEKARANG SINKRON 100%
@@ -226,7 +226,7 @@ fun DetailScreen(
                                         Icon(
                                             imageVector = Icons.Default.Star,
                                             contentDescription = null,
-                                            tint = if (i <= kotlin.math.round(averageRating).toInt()) Color(0xFFFFC107) else Color.LightGray,
+                                            tint = if (i <= kotlin.math.round(averageRating).toInt()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surfaceVariant,
                                             modifier = Modifier.size(14.dp)
                                         )
                                     }
@@ -407,7 +407,7 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        tint = if (i <= review.rating.toInt()) Color(0xFFFFC107) else Color.LightGray,
+                        tint = if (i <= review.rating.toInt()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
                 }
@@ -443,7 +443,7 @@ fun ReviewInputDialog(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = "Star $i",
-                            tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
+                            tint = if (i <= rating) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .size(36.dp)
                                 .clickable { rating = i.toDouble() }
@@ -459,7 +459,7 @@ fun ReviewInputDialog(
                     placeholder = { Text("Bagaimana pengalamanmu di sini?") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF005959))
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
                 )
             }
         },

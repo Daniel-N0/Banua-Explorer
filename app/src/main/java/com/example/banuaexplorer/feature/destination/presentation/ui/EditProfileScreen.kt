@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -130,7 +129,7 @@ fun EditProfileScreen(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(60.dp),
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                     }
@@ -148,7 +147,7 @@ fun EditProfileScreen(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Foto",
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier
                             .padding(6.dp)
                             .size(16.dp)
@@ -168,10 +167,10 @@ fun EditProfileScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color(0xFFD9D9D9),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
 
                     focusedTextColor =  MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor =  MaterialTheme.colorScheme.onBackground,
@@ -191,10 +190,10 @@ fun EditProfileScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color(0xFFD9D9D9),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
 
                     focusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -214,10 +213,10 @@ fun EditProfileScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color(0xFFD9D9D9),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
 
                     focusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -237,10 +236,10 @@ fun EditProfileScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color(0xFFD9D9D9),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = Color.Gray,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
 
                     focusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -281,7 +280,7 @@ fun EditProfileScreen(
             ) {
                 Text(
                     text = "Simpan Perubahan",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

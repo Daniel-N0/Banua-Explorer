@@ -20,7 +20,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,8 +33,8 @@ fun RegisterScreen(
     onRegisterClick: (String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-    val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFF8F9FA)
+    val banuaGreen = MaterialTheme.colorScheme.primary
+    val backgroundGray = MaterialTheme.colorScheme.background
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -52,8 +51,8 @@ fun RegisterScreen(
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        Text("Buat Akun", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF001F1F))
-        Text("Daftar untuk mulai menjelajah Banua.", fontSize = 14.sp, color = Color.Gray)
+        Text("Buat Akun", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+        Text("Daftar untuk mulai menjelajah Banua.", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
 
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -118,7 +117,7 @@ fun RegisterScreen(
                 val image =
                     if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = null, tint = Color.Gray)
+                    Icon(imageVector = image, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -144,14 +143,14 @@ fun RegisterScreen(
                 "Daftar Sekarang",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Row {
-            Text("Sudah punya akun? ", color = Color.Gray)
+            Text("Sudah punya akun? ", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             Text(
                 "Login di sini",
                 color = banuaGreen,

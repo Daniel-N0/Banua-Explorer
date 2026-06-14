@@ -55,21 +55,36 @@ fun AddEditScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nama Destinasi") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
                 value = kabupaten,
                 onValueChange = { kabupaten = it },
                 label = { Text("Kabupaten/Kota") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Kategori (Alam, Budaya, Buatan)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
@@ -77,7 +92,12 @@ fun AddEditScreen(
                 onValueChange = { description = it },
                 label = { Text("Deskripsi Wisata") },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 4
+                minLines = 4,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -104,7 +124,11 @@ fun AddEditScreen(
                     onSaveClick(newDest)
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
-                enabled = name.isNotBlank() && kabupaten.isNotBlank()
+                enabled = name.isNotBlank() && kabupaten.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(if (isEditMode) "Simpan Perubahan" else "Tambah Destinasi")
             }

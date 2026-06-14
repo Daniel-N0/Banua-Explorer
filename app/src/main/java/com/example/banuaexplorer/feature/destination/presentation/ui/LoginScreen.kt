@@ -1,6 +1,5 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -28,12 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +35,6 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit = {},
     onForgotPasswordClick: (String) -> Unit
 ) {
-    val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFF8F9FA)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -52,7 +43,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundGray)
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -62,13 +53,13 @@ fun LoginScreen(
             modifier = Modifier
                 .size(100.dp)
                 .background(
-                    banuaGreen.copy(alpha = 0.1f),
-                    androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    RoundedCornerShape(24.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             // Nanti bisa diganti pakai Image logo asli BanuaExplorer
-            Text("BE", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold, color = banuaGreen)
+            Text("BE", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -78,13 +69,13 @@ fun LoginScreen(
             text = "Selamat Datang!",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF001F1F)
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Silakan login untuk menjelajahi keindahan Banua.",
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -99,14 +90,14 @@ fun LoginScreen(
                 Icon(
                     Icons.Default.Email,
                     contentDescription = null,
-                    tint = banuaGreen
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             modifier = Modifier.fillMaxWidth(),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = banuaGreen,
-                focusedLabelColor = banuaGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true
@@ -123,7 +114,7 @@ fun LoginScreen(
                 Icon(
                     Icons.Default.Lock,
                     contentDescription = null,
-                    tint = banuaGreen
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             trailingIcon = {
@@ -133,15 +124,15 @@ fun LoginScreen(
                     Icon(
                         imageVector = image,
                         contentDescription = "Toggle Password Visibility",
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             modifier = Modifier.fillMaxWidth(),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = banuaGreen,
-                focusedLabelColor = banuaGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
             ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -161,7 +152,7 @@ fun LoginScreen(
             ) {
                 Text(
                     text = "Lupa Password?",
-                    color = banuaGreen,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -177,10 +168,10 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = banuaGreen),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Masuk", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Masuk", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -189,10 +180,10 @@ fun LoginScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Belum punya akun? ", color = Color.Gray)
+            Text("Belum punya akun? ", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             Text(
                 text = "Daftar di sini",
-                color = banuaGreen,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )

@@ -111,7 +111,7 @@ fun MainScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFFFFFFFF )),
+                        .background(MaterialTheme.colorScheme.background),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -167,7 +167,7 @@ fun MainScreen(
                 )
 
                 if (isLoading) {
-                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
+                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = MaterialTheme.colorScheme.primary) }
                 }
             }
 
@@ -201,7 +201,7 @@ fun MainScreen(
                 )
 
                 if (isLoading) {
-                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
+                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = MaterialTheme.colorScheme.primary) }
                 }
             }
 
@@ -391,11 +391,11 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(item.title) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    selectedTextColor = Color(0xFF006666),
-                    indicatorColor = Color(0xFF006666),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
         }
