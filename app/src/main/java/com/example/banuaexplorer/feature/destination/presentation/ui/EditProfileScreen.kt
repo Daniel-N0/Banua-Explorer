@@ -29,13 +29,12 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 
+
 @Composable
 fun EditProfileScreen(
     viewModel: DestinationViewModel,
     onBackClick: () -> Unit = {}
 ) {
-    val banuaGreen = Color(0xFF006666)
-    val backgroundGray = Color(0xFFF8F9FA)
     val profile by viewModel.userProfile.collectAsState()
 
     // Nanti pindahkan state ini ke ViewModel
@@ -72,7 +71,7 @@ fun EditProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundGray) // Background selaras dengan ProfileScreen
+            .background( MaterialTheme.colorScheme.background) // Background selaras dengan ProfileScreen
     ) {
         // --- 1. HEADER (Fixed) ---
         Row(
@@ -84,7 +83,7 @@ fun EditProfileScreen(
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Kembali",
-                tint = banuaGreen,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable { onBackClick() }
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -92,7 +91,7 @@ fun EditProfileScreen(
                 text = "Edit Profil",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = banuaGreen
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -114,7 +113,7 @@ fun EditProfileScreen(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFE0E0E0)),
+                        .background( MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
                     if (imageUri != null) {
@@ -139,7 +138,7 @@ fun EditProfileScreen(
 
                 // Badge Icon Edit Hijau
                 Surface(
-                    color = banuaGreen,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
                     modifier = Modifier
                         .padding(bottom = 4.dp, end = 4.dp)
@@ -168,16 +167,16 @@ fun EditProfileScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = banuaGreen,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color(0xFFD9D9D9),
 
-                    focusedLabelColor = banuaGreen,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = Color.Gray,
 
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
+                    focusedTextColor =  MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor =  MaterialTheme.colorScheme.onBackground,
 
-                    cursorColor = banuaGreen
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
 
@@ -191,16 +190,16 @@ fun EditProfileScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = banuaGreen,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color(0xFFD9D9D9),
 
-                    focusedLabelColor = banuaGreen,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = Color.Gray,
 
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
 
-                    cursorColor = banuaGreen
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
 
@@ -214,16 +213,16 @@ fun EditProfileScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = banuaGreen,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color(0xFFD9D9D9),
 
-                    focusedLabelColor = banuaGreen,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = Color.Gray,
 
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
 
-                    cursorColor = banuaGreen
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
 
@@ -237,16 +236,16 @@ fun EditProfileScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = banuaGreen,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = Color(0xFFD9D9D9),
 
-                    focusedLabelColor = banuaGreen,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = Color.Gray,
 
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
 
-                    cursorColor = banuaGreen
+                    cursorColor = MaterialTheme.colorScheme.primary
                 )
             )
 
@@ -277,7 +276,7 @@ fun EditProfileScreen(
                     .height(56.dp),
                 shape = RoundedCornerShape(32.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = banuaGreen
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(

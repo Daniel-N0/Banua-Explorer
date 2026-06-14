@@ -23,19 +23,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import com.example.banuaexplorer.ui.theme.BackgroundLight
+import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
 fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                    onDestinationClick: (Destination) -> Unit = {}) {
     val destinations by viewModel.favoriteDestinations.collectAsState()
 
-    val banuaGreen = Color(0xFF006666)
-    val backgroundGray = Color(0xFFF8F9FA)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundGray)
+            .background(BackgroundLight)
     ) {
         // --- HEADER (Identik dengan Partner Screen) ---
         Row(
@@ -50,7 +49,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = banuaGreen,
+                    tint = BanuaGreen,
                     modifier = Modifier.clickable { onBackClick() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -58,13 +57,13 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                     text = "Destinasi Favorit",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = banuaGreen
+                    color = BanuaGreen
                 )
             }
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = banuaGreen
+                tint = BanuaGreen
             )
         }
 
@@ -142,10 +141,10 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF006666).copy(alpha = 0.1f)),
+                    .background(BanuaGreen.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF006666))
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = BanuaGreen)
             }
 
             Spacer(modifier = Modifier.width(16.dp))

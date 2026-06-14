@@ -6,11 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,10 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
-import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
-fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}, onEditProfileClick: () -> Unit = {}, onLanguageClick: () -> Unit = {}, onAccountSettingClick: () -> Unit = {}, onLogoutClick: () -> Unit = {}, isDarkMode: Boolean = false, onDarkModeChange: (Boolean) -> Unit = {}) {
+fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}, onEditProfileClick: () -> Unit = {}, onLanguageClick: () -> Unit = {}, onLogoutClick: () -> Unit = {}, isDarkMode: Boolean = false, onDarkModeChange: (Boolean) -> Unit = {}) {
     val profile by viewModel.userProfile.collectAsState()
 
     // State untuk Switch Mode Gelap
@@ -35,7 +35,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGray)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp)
     ) {
         // --- HEADER ---
@@ -48,7 +48,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Kembali",
-                tint = BanuaGreen,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable { onBackClick() }
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -56,7 +56,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                 text = "Profil Saya",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = BanuaGreen
+                color =  MaterialTheme.colorScheme.primary
             )
         }
 
@@ -72,7 +72,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFE0E0E0)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     if (profile.photoUri != null) {
@@ -89,14 +89,14 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                             imageVector = Icons.Default.Person,
                             contentDescription = "Avatar",
                             modifier = Modifier.size(60.dp),
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
                 }
 
                 // Badge Icon Edit Hijau
                 Surface(
-                    color = BanuaGreen,
+                    color =  MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
                     modifier = Modifier
                         .padding(bottom = 4.dp, end = 4.dp)
@@ -126,12 +126,12 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                 text = profile.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = Color(0xFF001F1F)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = profile.email,
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
 
@@ -140,7 +140,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
         // --- MENU CARD ---
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -160,16 +160,10 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                 )
                 ProfileMenuItem(
                     icon = Icons.Outlined.DarkMode, // Icon Bulan Sabit yang pas!
-                    title = "Tampilan/Mode",
+                    title = "Mode Gelap",
                     isSwitch = true,
                     switchState = isDarkMode,
                     onSwitchChange = onDarkModeChange
-                )
-                ProfileMenuItem(
-                    icon = Icons.Outlined.Settings,
-                    title = "Pengaturan Akun",
-                    showArrow = true,
-                    onClick = onAccountSettingClick
                 )
             }
         }
@@ -178,7 +172,7 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
 
         // --- TOMBOL KELUAR (LOGOUT) ---
         Surface(
-            color = Color(0xFFFFF0F0), // Merah super muda
+            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f), // Merah super muda
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,15 +184,15 @@ fun ProfileScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.ExitToApp,
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = "Keluar",
-                    tint = Color(0xFFE53935) // Merah tegas
+                    tint = MaterialTheme.colorScheme.error // Merah tegas
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Keluar",
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFE53935),
+                    color = MaterialTheme.colorScheme.error,
                     fontSize = 16.sp
                 )
             }
@@ -237,13 +231,13 @@ fun ProfileMenuItem(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF006666).copy(alpha = 0.08f)), // Hijau sangat transparan
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), // Hijau sangat transparan
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = BanuaGreen,
+                    tint =  MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -252,7 +246,7 @@ fun ProfileMenuItem(
                 text = title,
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp,
-                color = Color(0xFF001F1F)
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -262,7 +256,7 @@ fun ProfileMenuItem(
                 Text(
                     text = trailingText,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -271,16 +265,16 @@ fun ProfileMenuItem(
                     checked = switchState,
                     onCheckedChange = onSwitchChange,
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Color(0xFF006666) // Hijau kalau nyala
+                        checkedThumbColor = MaterialTheme.colorScheme.surface,
+                        checkedTrackColor =  MaterialTheme.colorScheme.primary // Hijau kalau nyala
                     ),
                     modifier = Modifier.height(24.dp)
                 )
             } else if (showArrow) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Detail",
-                    tint = Color.LightGray,
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                     modifier = Modifier.size(20.dp)
                 )
             }

@@ -9,34 +9,53 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+
+// --- Import Destinasi ---
 import com.example.banuaexplorer.feature.destination.presentation.ui.MainScreen
-import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
-import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModelFactory
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModelFactory
+
+// --- Import Auth & Profile (Fitur Lu) ---
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModelFactory
+
+// --- Import Dark Mode (Fitur Daniel) ---
+import com.example.banuaexplorer.datastore.ThemePreference
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModelFactory
+
 import com.example.banuaexplorer.ui.theme.BanuaExplorerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
 
-    // ViewModel untuk Destinasi
+    // 1. ViewModel untuk Destinasi
     private val viewModel: DestinationViewModel by viewModels {
         val app = application as BanuaExplorerApplication
         DestinationViewModelFactory(app.container.destinationUseCase)
     }
 
-    // ViewModel untuk Authentication
+    // 2. ViewModel untuk Authentication (Fitur Lu)
     private val authViewModel: AuthViewModel by viewModels {
         val app = application as BanuaExplorerApplication
         AuthViewModelFactory(app.container.authUseCase)
     }
 
+    // 3. ViewModel untuk Theme/Dark Mode (Fitur Daniel)
+    private val themeViewModel: ThemeViewModel by viewModels {
+        ThemeViewModelFactory(
+            ThemePreference(applicationContext)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inisialisasi Cloudinary
+        // Inisialisasi Cloudinary (Fitur Lu)
         try {
             val config = mapOf(
                 "cloud_name" to "dzftert5l"
@@ -47,18 +66,24 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            BanuaExplorerTheme {
+            // Ambil state Dark Mode dari Daniel
+            val isDarkMode by themeViewModel.isDarkMode.collectAsState()
 
-                // Mengatur warna status bar dan navigation bar
+            BanuaExplorerTheme(
+                darkTheme = isDarkMode // Terapkan Dark Mode
+            ) {
+
                 ManageSystemUI()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Transparent
                 ) {
+                    // Masukkan ke-3 ViewModel ke MainScreen
                     MainScreen(
                         viewModel = viewModel,
-                        authViewModel = authViewModel
+                        authViewModel = authViewModel,
+                        themeViewModel = themeViewModel
                     )
                 }
             }
@@ -69,7 +94,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ManageSystemUI() {
     val systemUiController = rememberSystemUiController()
-    val banuaGreen = Color(0xFF006666)
+    // Pakai warna dari theme (Punya Daniel) biar aman pas ganti mode
+    val banuaGreen = MaterialTheme.colorScheme.primary
     val isLightTheme = MaterialTheme.colorScheme.background.value == Color.White.value
 
     SideEffect {
