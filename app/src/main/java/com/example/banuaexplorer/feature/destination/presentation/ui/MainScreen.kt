@@ -1,9 +1,7 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,19 +27,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
+import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
-fun MainScreen(viewModel: DestinationViewModel) {
+fun MainScreen(viewModel: DestinationViewModel,  themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val isDarkMode by themeViewModel.isDarkMode.collectAsState()
 
-    var isDarkMode by remember {
-        mutableStateOf(false)
-    }
     // Cek kapan Bottom Navbar harus muncul (Di halaman profil otomatis disembunyikan)
     val showBottomBar = currentRoute in listOf(
         Screen.Home.route,
@@ -142,7 +137,7 @@ fun MainScreen(viewModel: DestinationViewModel) {
                 )
             }
 
-            // 👇 TAMBAHAN: Daftarkan layar ProfileScreen di sini
+            //  TAMBAHAN: Daftarkan layar ProfileScreen di sini
             composable(Screen.Profile.route) {
                 ProfileScreen(
                     viewModel = viewModel,
@@ -153,7 +148,7 @@ fun MainScreen(viewModel: DestinationViewModel) {
                     isDarkMode = isDarkMode,
 
                     onDarkModeChange = {
-                        isDarkMode = it
+                        themeViewModel.setDarkMode(it)
                     },
 
                     onEditProfileClick = {
@@ -161,10 +156,6 @@ fun MainScreen(viewModel: DestinationViewModel) {
                     },
 
                     onLanguageClick = {
-                        // nanti
-                    },
-
-                    onAccountSettingClick = {
                         // nanti
                     },
 
@@ -244,8 +235,8 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
                 label = { Text(item.title) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
-                    selectedTextColor = Color(0xFF006666),
-                    indicatorColor = Color(0xFF006666),
+                    selectedTextColor = BanuaGreen,
+                    indicatorColor = BanuaGreen,
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray
                 )

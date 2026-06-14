@@ -28,8 +28,8 @@ import com.example.banuaexplorer.feature.destination.presentation.viewmodel.Dest
 import androidx.compose.foundation.lazy.items
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.banuaexplorer.ui.theme.BackgroundLight
 import com.example.banuaexplorer.ui.theme.BanuaGreen
-val BackgroundGray = Color(0xFFF8F9FA)
 
 @Composable
 fun HomeScreen(
@@ -80,7 +80,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGray)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -90,7 +90,7 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(240.dp))
 
-            // 👇 Oper state Kategori ke komponen UI-nya 👇
+            //  Oper state Kategori ke komponen UI-nya
             CategorySection(
                 selectedCategory = selectedCategory,
                 onCategoryClick = { category ->
@@ -161,7 +161,7 @@ fun HomeHeader(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
-            .background(BanuaGreen)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
         Column(
             modifier = Modifier
@@ -174,8 +174,8 @@ fun HomeHeader(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Selamat Malam, Ilham!", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                    Text("Jumat, 12 Juni 2026", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                    Text("Selamat Malam, Ganteng!", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    Text("Jumat, 12 Juni 2026", color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 12.sp)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -191,7 +191,7 @@ fun HomeHeader(
                         ) {
                             Text(
                                 text = "Jelajahi wisata di $selectedRegion",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold,
                                 // 1. TURUNKAN FONT SIZE JADI 15.sp ATAU 14.sp
                                 fontSize = 15.sp,
@@ -204,18 +204,18 @@ fun HomeHeader(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = "Pilih Daerah",
-                                tint = Color.White
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
 
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            modifier = Modifier.background(Color.White)
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             regions.forEach { region ->
                                 DropdownMenuItem(
-                                    text = { Text(region, color = BanuaGreen, fontWeight = FontWeight.Medium) },
+                                    text = { Text(region, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium) },
                                     onClick = {
                                         onRegionChange(region)
                                         expanded = false
@@ -231,11 +231,11 @@ fun HomeHeader(
                         .padding(start = 16.dp)
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color.LightGray)
+                        .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
                         .clickable { onProfileIconClick() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("I", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text("I", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
             }
 
@@ -245,15 +245,15 @@ fun HomeHeader(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                placeholder = { Text("Cari destinasi wisata...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = BanuaGreen) },
+                placeholder = { Text("Cari destinasi wisata...", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedBorderColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent,
-                    focusedTextColor = BanuaGreen,
-                    unfocusedTextColor = BanuaGreen
+                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true,
@@ -289,7 +289,7 @@ fun CategorySection(
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     // Ganti warna latar kalau terpilih
-                    color = if (isSelected) BanuaGreen else Color.White,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                     shadowElevation = 2.dp,
                     modifier = Modifier.size(56.dp)
                 ) {
@@ -297,7 +297,7 @@ fun CategorySection(
                         Text(
                             text = category.take(1),
                             // Ganti warna huruf kalau terpilih
-                            color = if (isSelected) Color.White else BanuaGreen,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp
                         )
@@ -309,7 +309,7 @@ fun CategorySection(
                     fontSize = 12.sp,
                     // Huruf jadi lebih tebal kalau terpilih
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                    color = BanuaGreen
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -321,10 +321,10 @@ fun CategorySection(
 fun DestinationRecommendationSection(destinations: List<Destination>, onDestinationClick: (Destination) -> Unit, onSeeAllClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("Rekomendasi Destinasi", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("Rekomendasi Destinasi", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
             Text(
                 "Lihat Semua",
-                color = BanuaGreen,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable {
@@ -336,21 +336,21 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
         Spacer(modifier = Modifier.height(12.dp))
 
         if (destinations.isEmpty()) {
-            Text("Tidak ada destinasi ditemukan.", color = Color.Gray, modifier = Modifier.padding(horizontal = 24.dp))
+            Text("Tidak ada destinasi ditemukan.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(horizontal = 24.dp))
         } else {
             LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(destinations.size) { index ->
                     val destination = destinations[index]
-                    Card(modifier = Modifier.width(220.dp).clickable { onDestinationClick(destination) }, colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Card(modifier = Modifier.width(220.dp).clickable { onDestinationClick(destination) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                         Column {
-                            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(BanuaGreen))
+                            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(MaterialTheme.colorScheme.primary))
                             Column(modifier = Modifier.padding(12.dp)) {
-                                Text(destination.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
+                                Text(destination.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = Color.Gray)
+                                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text(destination.kabupaten, fontSize = 12.sp, color = Color.Gray)
+                                    Text(destination.kabupaten, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                                 }
                             }
                         }
@@ -370,7 +370,7 @@ fun EventBannerSection() {
         EventItem("Lomba Jukung Tradisional", "Sungai Martapura", "MINGGU DEPAN")
     )
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = "Event Mendatang", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 24.dp))
+        Text(text = "Event Mendatang", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(horizontal = 24.dp))
         Spacer(modifier = Modifier.height(16.dp))
         LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             items(dummyEvents) { event ->
@@ -382,12 +382,12 @@ fun EventBannerSection() {
 
 @Composable
 fun EventCard(event: EventItem) {
-    Surface(shape = RoundedCornerShape(16.dp), color = BanuaGreen, modifier = Modifier.width(280.dp).height(100.dp)) {
+    Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.primary, modifier = Modifier.width(280.dp).height(100.dp)) {
         Row(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = event.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2)
+                Text(text = event.title, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = event.location, color = Color.White.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
+                Text(text = event.location, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
             }
             Spacer(modifier = Modifier.width(8.dp))
             Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFC107)) {
@@ -397,13 +397,13 @@ fun EventCard(event: EventItem) {
     }
 }
 
-// 👇 INI YANG HILANG DAN BIKIN ERROR (Data struktur Event) 👇
+//  INI YANG HILANG DAN BIKIN ERROR (Data struktur Event)
 data class EventItem(val title: String, val location: String, val status: String)
 
 @Composable
 fun TourPackageSection(onPackageClick: (String) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text("Penawaran Paket Wisata", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 24.dp))
+        Text("Penawaran Paket Wisata", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(horizontal = 24.dp))
         Spacer(modifier = Modifier.height(12.dp))
 
         val dummyPackages = listOf("3H2M Susur Loksado" to "Rp 1.200.000", "2H1M Pasar Terapung" to "Rp 850.000")
@@ -414,17 +414,17 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
                     modifier = Modifier
                         .width(260.dp)
                         .clickable { onPackageClick(dummyPackages[index].first) },
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(BanuaGreen), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.White)
+                        Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(dummyPackages[index].first, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text(dummyPackages[index].second, color = BanuaGreen, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Text(dummyPackages[index].first, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                            Text(dummyPackages[index].second, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                             Spacer(modifier = Modifier.height(4.dp))
                             Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp)) {
                                 Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
@@ -445,8 +445,8 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Duta Daerah", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("Lihat Semua", color = BanuaGreen, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable { onAmbassadorClick() })
+            Text("Duta Daerah", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+            Text("Lihat Semua", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable { onAmbassadorClick() })
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -457,11 +457,11 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable { onAmbassadorClick() }
                 ) {
-                    Box(modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFF1A1A1A)))
+                    Box(modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text(text = ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                     Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                        Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                        Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
                     }
                 }
             }

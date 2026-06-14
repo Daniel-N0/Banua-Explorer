@@ -42,7 +42,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import kotlin.math.ceil
 import android.content.Intent
 import android.net.Uri
-import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
 fun MapScreen(viewModel: DestinationViewModel) {
@@ -192,7 +191,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                 value = searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
                 placeholder = { Text("Cari destinasi di peta...", fontSize = 14.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = BanuaGreen) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White,
                     focusedContainerColor = Color.White,
@@ -234,7 +233,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                     Text(
                         text = "Informasi Perjalanan",
                         style = MaterialTheme.typography.titleMedium,
-                        color = BanuaGreen
+                        color =  MaterialTheme.colorScheme.primary
                     )
 
                     selectedDestination?.let {
@@ -267,7 +266,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                                 .height(48.dp), // Buat tombol agak tinggi agar mudah diklik
                             shape = RoundedCornerShape(24.dp), // Buat ujungnya bulat sempurna ala kapsul
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = BanuaGreen // Beri warna hijau khas Banua
+                                containerColor =  MaterialTheme.colorScheme.primary // Beri warna hijau khas Banua
                             )
                         ) {
                             Text(
@@ -366,10 +365,10 @@ fun MapDestinationCard(destination: Destination, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(70.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF006666).copy(alpha = 0.1f)),
+                    .background( MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF006666))
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint =  MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {

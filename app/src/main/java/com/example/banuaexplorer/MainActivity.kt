@@ -16,6 +16,11 @@ import com.example.banuaexplorer.feature.destination.presentation.viewmodel.Dest
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModelFactory
 import com.example.banuaexplorer.ui.theme.BanuaExplorerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import com.example.banuaexplorer.datastore.ThemePreference
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -26,19 +31,34 @@ class MainActivity : ComponentActivity() {
         DestinationViewModelFactory(app.container.destinationUseCase)
     }
 
+    private val themeViewModel: ThemeViewModel by viewModels {
+        ThemeViewModelFactory(
+            ThemePreference(applicationContext)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BanuaExplorerTheme {
 
-                // Mengontrol warna status bar dan nav bar sistem
+            val isDarkMode by themeViewModel.isDarkMode.collectAsState()
+
+            BanuaExplorerTheme(
+                darkTheme = isDarkMode
+            ) {
+
                 ManageSystemUI()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Transparent
                 ) {
-                    MainScreen(viewModel = viewModel)
+
+                    MainScreen(
+                        viewModel = viewModel,
+                        themeViewModel = themeViewModel
+                    )
+
                 }
             }
         }
@@ -48,7 +68,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ManageSystemUI() {
     val systemUiController = rememberSystemUiController()
-    val banuaGreen = Color(0xFF006666) // Warna hijau ciri khas BanuaExplorer
+    val banuaGreen = MaterialTheme.colorScheme.primary// Warna hijau ciri khas BanuaExplorer
     val isLightTheme = MaterialTheme.colorScheme.background.value == Color.White.value
 
     SideEffect {
