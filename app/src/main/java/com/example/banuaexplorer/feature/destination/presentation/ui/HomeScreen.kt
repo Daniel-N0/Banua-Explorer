@@ -39,7 +39,7 @@ fun HomeScreen(
     viewModel: DestinationViewModel,
     onDestinationClick: (Destination) -> Unit,
     onProfileClick: () -> Unit,
-    onAmbassadorClick: () -> Unit,
+    onAmbassadorClick: (String) -> Unit,
     onSeeAllClick: () -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
@@ -445,7 +445,10 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
 }
 
 @Composable
-fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Unit) {
+fun AmbassadorSection(
+    ambassadors: List<Ambassador>,
+    onAmbassadorClick: (String) -> Unit // <--- TAMBAHIN (String) DI SINI!
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
@@ -453,22 +456,62 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: () -> Un
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Duta Daerah", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-            Text("Lihat Semua", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable { onAmbassadorClick() })
+            Text(
+                text = "Lihat Semua",
+                modifier = Modifier.clickable {
+                    // buka halaman semua duta
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             items(ambassadors) { ambassador ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.clickable { onAmbassadorClick() }
+                    modifier = Modifier
+                        .width(100.dp) // Kasih lebar biar rapi
+                        .clickable { onAmbassadorClick(ambassador.id) } // <--- Bawa ID Duta di sini
                 ) {
-                    Box(modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant))
+                    // --- FOTO DINAMIS ---
+                    AsyncImage(
+                        model = ambassador.imageUrl,
+                        contentDescription = ambassador.name,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentScale = ContentScale.Crop
+                    )
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
-                    Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                        Text(text = "DUTA", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+
+                    // --- NAMA DINAMIS ---
+                    Text(
+                        text = ambassador.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Surface(
+                        color = Color(0xFFFFC107),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Text(
+                            text = "DUTA",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
                     }
                 }
             }

@@ -30,19 +30,22 @@ import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.domain.model.Partner
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.ui.theme.BanuaGreen
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun PartnerScreen(viewModel: DestinationViewModel) {
+fun PartnerScreen(
+    viewModel: DestinationViewModel,
+    onNavigateToDutaDetail: (String) -> Unit // <-- Colokan utama navigasi sudah terpasang
+) {
     val partners by viewModel.partners.collectAsState()
     val ambassadors by viewModel.ambassadors.collectAsState()
 
-    // State untuk mendeteksi apakah user sedang melihat detail kelompok Duta
     var selectedGroup by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
-    // JIKA USER KLIK KELOMPOK DUTA, TAMPILKAN HALAMAN KELOMPOK YANG SESUAI
     if (selectedGroup != null) {
-
-        // Filter cerdas membaca field 'kabupaten'
         val filteredAmbassadors = ambassadors.filter { ambassador ->
             if (selectedGroup == "Duta Kota Banjarmasin") {
                 ambassador.kabupaten.contains("Banjarmasin", ignoreCase = true)
@@ -56,10 +59,10 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
         DutaDetailGroupScreen(
             groupName = selectedGroup!!,
             ambassadorList = filteredAmbassadors,
-            onBackClick = { selectedGroup = null }
+            onBackClick = { selectedGroup = null },
+            onNavigateToDutaDetail = onNavigateToDutaDetail // <-- Diterusin ke halaman detail kelompok
         )
     } else {
-        // --- DI SINI PERBAIKANNYA: COLUMN DAN HEADER DIKEMBALIKAN KE ATAS ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -151,20 +154,18 @@ fun PartnerScreen(viewModel: DestinationViewModel) {
     }
 }
 
-
-// --- HALAMAN BARU: DETAIL ANGGOTA PER KELOMPOK DUTA ---
 @Composable
 fun DutaDetailGroupScreen(
     groupName: String,
     ambassadorList: List<Ambassador>,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToDutaDetail: (String) -> Unit // <--- TAMBAHIN (String) DI SINI AJA BRO!
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
     ) {
-        // Top Bar Navigasi Kembali
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -181,7 +182,6 @@ fun DutaDetailGroupScreen(
             Text(groupName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
         }
 
-        // Teks Pengantar
         Column(
             modifier = Modifier.padding(
                 start = 24.dp,
@@ -193,7 +193,6 @@ fun DutaDetailGroupScreen(
             Text("Duta Pariwisata & Kebudayaan", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF001F1F))
         }
 
-        // Grid Viewcard Perorangan Anggota
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
@@ -202,7 +201,10 @@ fun DutaDetailGroupScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             items(ambassadorList) { ambassador ->
-                IndividualAmbassadorCard(ambassador = ambassador)
+                IndividualAmbassadorCard(
+                    ambassador = ambassador,
+                    onBioClick = { onNavigateToDutaDetail(ambassador.id) } // <-- Balikin jadi gini
+                )
             }
 
             item(span = { GridItemSpan(2) }) {
@@ -212,14 +214,13 @@ fun DutaDetailGroupScreen(
     }
 }
 
-// --- VIEW CARD PERORANGAN ---
 @Composable
-fun IndividualAmbassadorCard(ambassador: Ambassador) {
+fun IndividualAmbassadorCard(ambassador: Ambassador, onBioClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth() // <-- Card sudah TIDAK ADA clickable
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -255,14 +256,14 @@ fun IndividualAmbassadorCard(ambassador: Ambassador) {
             Surface(
                 color = BanuaGreen.copy(alpha = 0.1f),
                 shape = CircleShape,
-                modifier = Modifier.clickable { }
+                modifier = Modifier.clickable { onBioClick() } // <-- Tombol Lihat Bio AKAN BISA DI KLIK
             ) {
                 Text(
                     "Lihat Bio",
                     color = BanuaGreen,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                 )
             }
         }

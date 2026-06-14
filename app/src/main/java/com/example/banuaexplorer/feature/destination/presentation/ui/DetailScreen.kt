@@ -1,6 +1,6 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,24 +20,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Review
-import java.util.UUID
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     destination: Destination,
-    reviews: List<Review>,
+    reviews: List<Review>, // Ini data lokal (Room)
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
     onBackClick: () -> Unit = {},
-    onRouteClick: () -> Unit, // <--- 1. TAMBAHKAN PARAMETER INI
+    onRouteClick: () -> Unit,
     onSaveReview: (Review) -> Unit,
     onDeleteReview: (Review) -> Unit
 ) {
@@ -47,13 +47,19 @@ fun DetailScreen(
 
     var showDialog by remember { mutableStateOf(false) }
     var editingReview by remember { mutableStateOf<Review?>(null) }
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val averageRating = if (reviews.isNotEmpty()) reviews.sumOf { it.rating } / reviews.size else 0.0
-    val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
+    // State buat nampung data dari Firebase
+    var realGalleryUrls by remember { mutableStateOf<List<String>>(emptyList()) }
+    var publicReviews by remember { mutableStateOf<List<Review>>(emptyList()) }
+
+    // GABUNGAN DATA: Kalau Firebase ada, pake Firebase. Kalau kosong/offline, pake lokal.
+    val displayReviews = if (publicReviews.isNotEmpty()) publicReviews else reviews
+    val averageRating = if (displayReviews.isNotEmpty()) displayReviews.sumOf { it.rating } / displayReviews.size else 0.0
+    val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
+
     Box(modifier = Modifier.fillMaxSize().background(backgroundGray)) {
-// --- 1. GAMBAR BACKGROUND (HEADER) ---
+        // --- 1. GAMBAR BACKGROUND (HEADER) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,15 +67,12 @@ fun DetailScreen(
                 .background(Color(0xFF2E8B57)),
             contentAlignment = Alignment.Center
         ) {
-            // Menggunakan AsyncImage untuk memuat foto dari URL
             AsyncImage(
                 model = destination.imageUrl,
                 contentDescription = "Foto ${destination.name}",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop // Agar gambar penuh tanpa mengubah rasio
+                contentScale = ContentScale.Crop
             )
-
-            // Overlay gelap tipis agar tombol Back & Love tetap terlihat jelas
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -77,8 +80,7 @@ fun DetailScreen(
             )
         }
 
-        // --- 2. KONTEN UTAMA (BOTTOM SHEET STYLE) ---
-        // Dipindah ke atas agar posisinya di BAWAH tombol (karena dirender duluan)
+        // --- 2. KONTEN UTAMA ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +133,7 @@ fun DetailScreen(
                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFF9800), modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "$formattedRating/5", // <--- SEKARANG SINKRON 100%
+                                    text = "$formattedRating/5",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -142,7 +144,6 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // --- JAM OPERASIONAL ---
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(banuaGreen))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -151,7 +152,6 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // --- DESKRIPSI ---
                     Text(
                         text = destination.description,
                         fontSize = 14.sp,
@@ -161,31 +161,63 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- GALERI FOTO ---
+                    // --- GALERI FOTO & ULASAN REALTIME FIREBASE ---
                     Text("Galeri Foto", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Kita looping berdasarkan data yang dibawa destinasi itu
-                        items(destination.galleryUrls) { url ->
-                            AsyncImage(
-                                model = url, // Ambil URL dinamis dari database
-                                contentDescription = "Foto Destinasi",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .clickable { selectedImage = url }, // Saat diklik, URL-nya yang masuk state
-                                contentScale = ContentScale.Crop
-                            )
+
+                    LaunchedEffect(destination.id) {
+                        if (destination.id.isNotEmpty() && destination.id != "dummy_1") {
+                            val db = Firebase.firestore
+
+                            // Tarik Galeri
+                            db.collection("destinations")
+                                .whereEqualTo("id", destination.id)
+                                .get()
+                                .addOnSuccessListener { querySnapshot ->
+                                    if (!querySnapshot.isEmpty) {
+                                        val urls = querySnapshot.documents[0].get("galleryUrls") as? List<String> ?: emptyList()
+                                        realGalleryUrls = urls
+                                    }
+                                }
+
+                            // Tarik Ulasan REAL-TIME (Snapshot Listener)
+                            db.collection("reviews")
+                                .whereEqualTo("destinationId", destination.id)
+                                .addSnapshotListener { snapshot, error ->
+                                    if (error != null) {
+                                        Log.e("Firebase", "Gagal narik ulasan", error)
+                                        return@addSnapshotListener
+                                    }
+                                    if (snapshot != null) {
+                                        val fetchedReviews = snapshot.documents.mapNotNull {
+                                            it.toObject(Review::class.java)
+                                        }.sortedByDescending { it.timestamp }
+                                        publicReviews = fetchedReviews
+                                    }
+                                }
                         }
                     }
 
-                    if (selectedImage != null) {
-                        PhotoDetailScreen(imageUrl = selectedImage!!) { selectedImage = null }
+                    if (realGalleryUrls.isNotEmpty()) {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(realGalleryUrls) { url ->
+                                AsyncImage(
+                                    model = url,
+                                    contentDescription = "Foto Destinasi",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .clickable { selectedImage = url },
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    } else {
+                        Text("Memuat galeri...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- TOMBOL SOSIAL MEDIA ---
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -215,22 +247,16 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(40.dp))
 
                     // --- BAGIAN ULASAN (BREAD) ---
-                    // Logika hitung rata-rata rating dinamis
-                    val averageRating = if (reviews.isNotEmpty()) reviews.sumOf { it.rating } / reviews.size else 0.0
-                    val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // Angka Rating Dinamis
                             Text(formattedRating, fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Row {
-                                    // Bintang Global Dinamis
                                     for (i in 1..5) {
                                         Icon(
                                             imageVector = Icons.Default.Star,
@@ -240,7 +266,7 @@ fun DetailScreen(
                                         )
                                     }
                                 }
-                                Text("${reviews.size} ULASAN", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+                                Text("${displayReviews.size} ULASAN", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
                             }
                         }
 
@@ -258,17 +284,20 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (reviews.isEmpty()) {
+                    if (displayReviews.isEmpty()) {
                         Text("Belum ada ulasan. Jadilah yang pertama!", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(vertical = 16.dp))
                     } else {
-                        reviews.forEach { review ->
+                        displayReviews.forEach { review ->
                             ReviewCardUI(
                                 review = review,
                                 onEdit = {
                                     editingReview = review
                                     showDialog = true
                                 },
-                                onDelete = { onDeleteReview(review) }
+                                onDelete = {
+                                    onDeleteReview(review) // Hapus Lokal
+                                    Firebase.firestore.collection("reviews").document(review.id).delete() // Hapus Cloud
+                                }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
@@ -276,7 +305,6 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- VIDEO RELEVAN ---
                     Text("Video Relevan", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -299,7 +327,6 @@ fun DetailScreen(
             }
         }
 
-        // --- 3. TOMBOL AKSI BAWAH (TRANSPARAN MELAYANG) ---
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -307,7 +334,7 @@ fun DetailScreen(
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Button(
-                onClick = onRouteClick, // <--- 2. CUKUP PANGGIL LAMBDA INI BRO!
+                onClick = onRouteClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -321,8 +348,6 @@ fun DetailScreen(
             }
         }
 
-        // --- 4. TOMBOL BACK & FAVORITE (FLOATING TOP) ---
-        // Dipindah ke PALING BAWAH di dalam Box agar menjadi PALING ATAS di layar (Z-Index tertinggi)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -335,7 +360,7 @@ fun DetailScreen(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Kembali",
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp) // Ukuran icon diperbesar sedikit
+                    modifier = Modifier.size(28.dp)
                 )
             }
             IconButton(onClick = onFavoriteClick) {
@@ -347,30 +372,38 @@ fun DetailScreen(
                 )
             }
         }
+
+        if (selectedImage != null) {
+            PhotoDetailScreen(imageUrl = selectedImage!!) { selectedImage = null }
+        }
     }
 
-    // ... (Sisa fungsi ReviewInputDialog & ReviewCardUI tetap sama, tidak aku sertakan lagi agar tidak kepanjangan) ...
-    // --- POP-UP DIALOG KETIK ULASAN ---
     if (showDialog) {
         ReviewInputDialog(
             initialText = editingReview?.comment ?: "",
-            initialRating = editingReview?.rating ?: 5.0, // <-- Lempar rating lama kalau lagi mode Edit
+            initialRating = editingReview?.rating ?: 5.0,
             onDismiss = { showDialog = false },
-            onSubmit = { ratingResult, commentResult ->  // <-- Nangkep Bintang & Teks
+            onSubmit = { ratingResult, commentResult ->
                 val finalReview = editingReview?.copy(
-                    rating = ratingResult, // <-- Update bintang
+                    rating = ratingResult,
                     comment = commentResult,
                     timestamp = System.currentTimeMillis()
                 ) ?: Review(
                     id = java.util.UUID.randomUUID().toString(),
                     destinationId = destination.id,
-                    userName = "Anda",
+                    userName = "Muhammad Ilham", // Sinkron dengan username di ReviewCardUI
                     userAvatarUrl = "",
-                    rating = ratingResult, // <-- Simpan bintang baru
+                    rating = ratingResult,
                     comment = commentResult,
                     timestamp = System.currentTimeMillis()
                 )
+
                 onSaveReview(finalReview)
+
+                Firebase.firestore.collection("reviews")
+                    .document(finalReview.id)
+                    .set(finalReview)
+
                 showDialog = false
             }
         )
@@ -379,7 +412,8 @@ fun DetailScreen(
 
 @Composable
 fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
-    val isCurrentUser = review.userName == "Anda"
+    // Karena lu save pake nama asli, cek kepemilikannya juga harus pakai nama asli
+    val isCurrentUser = review.userName == "Muhammad Ilham" || review.userName == "Anda"
     val bgColor = if (isCurrentUser) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface
 
     Card(
@@ -394,7 +428,8 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
                     modifier = Modifier.size(40.dp).clip(CircleShape).background(if (isCurrentUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(review.userName.take(1).uppercase(), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+                    // Pakai huruf pertama dari nama buat avatar
+                    Text(if (review.userName.isNotEmpty()) review.userName.take(1).uppercase() else "A", color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -410,7 +445,6 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- INI TAMBAHAN BINTANG TIAP USER ---
             Row {
                 for (i in 1..5) {
                     Icon(
@@ -431,19 +465,18 @@ fun ReviewCardUI(review: Review, onEdit: () -> Unit, onDelete: () -> Unit) {
 @Composable
 fun ReviewInputDialog(
     initialText: String,
-    initialRating: Double = 5.0, // <-- Tambahan: Rating bawaan
+    initialRating: Double = 5.0,
     onDismiss: () -> Unit,
-    onSubmit: (Double, String) -> Unit // <-- Tambahan: Balikin Rating & Teks
+    onSubmit: (Double, String) -> Unit
 ) {
     var text by remember { mutableStateOf(initialText) }
-    var rating by remember { mutableDoubleStateOf(initialRating) } // <-- State buat bintang
+    var rating by remember { mutableDoubleStateOf(initialRating) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (initialText.isEmpty()) "Tulis Ulasan" else "Edit Ulasan", fontWeight = FontWeight.Bold) },
         text = {
             Column {
-                // --- BARISAN BINTANG KLIKABLE ---
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
@@ -461,7 +494,6 @@ fun ReviewInputDialog(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // --- KOTAK TEKS ---
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
@@ -474,7 +506,7 @@ fun ReviewInputDialog(
         },
         confirmButton = {
             Button(
-                onClick = { onSubmit(rating, text) }, // <-- Kirim Rating dan Teks
+                onClick = { onSubmit(rating, text) },
                 enabled = text.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) { Text("Simpan") }

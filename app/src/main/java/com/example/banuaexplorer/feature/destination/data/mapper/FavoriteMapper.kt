@@ -37,7 +37,8 @@ fun FavoriteEntity.toDomainModel(): Destination {
         dutaPick = this.dutaPick,
         facilities = this.facilities,
         rating = this.rating,
-        reviewCount = this.reviewCount
+        reviewCount = this.reviewCount,
+        galleryUrls = emptyList()
     )
 }
 
