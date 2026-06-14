@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029141359248",
+    "project_id": "fir-banuaexplorer",
+    "storage_bucket": "fir-banuaexplorer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029141359248:android:196988ee056054213e0615",
+        "android_client_info": {
+          "package_name": "com.example.banuaexplorer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuXylzKq2x8ZrCIyx_FQMysBzkLRtfIaA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
