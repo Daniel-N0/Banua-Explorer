@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 
@@ -35,151 +37,64 @@ fun AllDestinationsScreen(
 ) {
     val destinations by viewModel.destinations.collectAsState()
 
-    // --- STATE FILTER ---
     var searchQuery by remember { mutableStateOf("") }
     var selectedRegion by remember { mutableStateOf("Kalimantan Selatan") }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
 
-    val regions = listOf(
-        "Kalimantan Selatan", "Banjarmasin", "Banjarbaru", "Banjar",
-        "Barito Kuala", "Tapin", "Hulu Sungai Selatan", "Hulu Sungai Tengah",
-        "Hulu Sungai Utara", "Balangan", "Tabalong", "Tanah Laut",
-        "Tanah Bumbu", "Kotabaru"
-    )
+    val regions = listOf("Kalimantan Selatan", "Banjarmasin", "Banjarbaru", "Banjar", "Barito Kuala", "Tapin", "Hulu Sungai Selatan", "Hulu Sungai Tengah", "Hulu Sungai Utara", "Balangan", "Tabalong", "Tanah Laut", "Tanah Bumbu", "Kotabaru")
     val categories = listOf("Alam", "Budaya", "Kuliner", "Sejarah", "Religi")
     var expandedRegion by remember { mutableStateOf(false) }
 
-    // --- LOGIKA FILTER ---
     val filteredList = destinations.filter { dest ->
         val matchRegion = if (selectedRegion == "Kalimantan Selatan") true else dest.kabupaten.contains(selectedRegion, ignoreCase = true)
         val matchSearch = if (searchQuery.isEmpty()) true else dest.name.contains(searchQuery, ignoreCase = true)
-        // Pastikan variabel 'kategori' sesuai dengan yang ada di model Destination kamu
         val matchCat = if (selectedCategory == null) true else dest.category.equals(selectedCategory, ignoreCase = true)
-
         matchRegion && matchSearch && matchCat
     }
 
     Scaffold(
         topBar = {
-            // --- HEADER PAKET LENGKAP ---
-            Surface(
-                shadowElevation = 8.dp,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-            ) {
+            Surface(shadowElevation = 8.dp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
-                    // 1. Baris Judul & Back (PERBAIKAN ALIGNMENT)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 14.dp, bottom = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Menggunakan Icon dengan padding manual agar rata kiri presisi
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .clip(CircleShape)
-                                .clickable { onBackClick() }
-                                .padding(8.dp) // Area sentuh
-                        )
+                    Row(modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 16.dp).clip(CircleShape).clickable { onBackClick() }.padding(8.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Eksplor Wisata Banua",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
+                        Text(text = stringResource(R.string.eksplor_wisata), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                     }
 
-                    // 2. Baris Filter Wilayah (Dropdown)
                     Box(modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { expandedRegion = true }
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { expandedRegion = true }) {
                             Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(selectedRegion, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Text(String.format(stringResource(R.string.explore_banua), selectedRegion), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                             Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         }
                         DropdownMenu(expanded = expandedRegion, onDismissRequest = { expandedRegion = false }) {
-                            regions.forEach { region ->
-                                DropdownMenuItem(
-                                    text = { Text(region) },
-                                    onClick = { selectedRegion = region; expandedRegion = false }
-                                )
-                            }
+                            regions.forEach { region -> DropdownMenuItem(text = { Text(region) }, onClick = { selectedRegion = region; expandedRegion = false }) }
                         }
                     }
 
-                    // 3. Search Bar (PERBAIKAN TEKS VERTICAL CENTER)
                     OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text("Cari nama tempat...", fontSize = 14.sp) },
+                        value = searchQuery, onValueChange = { searchQuery = it },
+                        placeholder = { Text(stringResource(R.string.cari_nama_tempat), fontSize = 14.sp) },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 8.dp),
-                        // .height(50.dp) DIHAPUS agar teks otomatis center
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
                         shape = RoundedCornerShape(24.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
-                        ),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedBorderColor = Color.Transparent, focusedBorderColor = Color.Transparent),
                         singleLine = true
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 4. Filter Kategori (GAYA HOMEPAGE)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                         categories.forEach { category ->
                             val isSelected = category == selectedCategory
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.clickable {
-                                    // Logika Toggle: Klik lagi untuk reset (Pilih Semua)
-                                    selectedCategory = if (selectedCategory == category) null else category
-                                }
-                            ) {
-                                Surface(
-                                    shape = RoundedCornerShape(16.dp),
-                                    // Putih solid kalau dipilih, Putih transparan kalau tidak
-                                    color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
-                                    shadowElevation = if (isSelected) 4.dp else 0.dp,
-                                    modifier = Modifier.size(56.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text(
-                                            text = category.take(1),
-                                            // Teks hijau kalau dipilih, Putih kalau tidak
-                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 20.sp
-                                        )
-                                    }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { selectedCategory = if (selectedCategory == category) null else category }) {
+                                Surface(shape = RoundedCornerShape(16.dp), color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surface.copy(alpha = 0.2f), shadowElevation = if (isSelected) 4.dp else 0.dp, modifier = Modifier.size(56.dp)) {
+                                    Box(contentAlignment = Alignment.Center) { Text(text = category.take(1), color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = category,
-                                    fontSize = 12.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                    // Teks bawah harus putih agar kontras dengan background header
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
+                                Text(text = category, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
                     }
@@ -187,27 +102,12 @@ fun AllDestinationsScreen(
             }
         }
     ) { padding ->
-        // --- CONTENT GRID ---
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
             if (filteredList.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Destinasi tidak ditemukan", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                }
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(stringResource(R.string.destinasi_tidak_ditemukan), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) }
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(filteredList) { destination ->
-                        DestinationGridItem(destination, onDestinationClick)
-                    }
+                LazyVerticalGrid(columns = GridCells.Fixed(2), contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    items(filteredList) { destination -> DestinationGridItem(destination, onDestinationClick) }
                 }
             }
         }
@@ -217,33 +117,15 @@ fun AllDestinationsScreen(
 @Composable
 fun DestinationGridItem(destination: Destination, onClick: (Destination) -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick(destination) },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        modifier = Modifier.fillMaxWidth().clickable { onClick(destination) },
+        shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
-            // Gambar Placeholder
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             Column(modifier = Modifier.padding(12.dp)) {
-                Text(
-                    text = destination.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))

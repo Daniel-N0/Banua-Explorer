@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.banuaexplorer.datastore.LanguagePreference
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Partner
@@ -36,7 +37,8 @@ data class UserProfile(
 )
 
 class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel() {
-
+    private val _isEnglish = MutableStateFlow(false)
+    val isEnglish: StateFlow<Boolean> = _isEnglish.asStateFlow()
     // ==========================================
     // 1. STATE LOKASI & PETA
     // ==========================================
@@ -122,6 +124,7 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
 
     init {
         observeLocalData()
+
         refreshAllData()
         getAmbassadorsFromFirebase()
         loadCurrentUserProfile()
