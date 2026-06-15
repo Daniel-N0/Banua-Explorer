@@ -104,4 +104,10 @@
     <string name="rating_bintang">Rating: %d Stars</string>
     <string name="komentar">Comment</string>
     <string name="kirim">Send</string>
+
+    <string name="cat_alam">Nature</string>
+    <string name="cat_budaya">Culture</string>
+    <string name="cat_kuliner">Culinary</string>
+    <string name="cat_sejarah">History</string>
+    <string name="cat_religi">Religious</string>
 </resources>

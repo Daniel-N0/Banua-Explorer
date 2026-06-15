@@ -39,7 +39,8 @@ fun ProfileScreen(
     viewModel: DestinationViewModel,
     onBackClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
-    onLanguageClick: () -> Unit = {},
+    isEnglish: Boolean = false,
+    onLanguageChange: (Boolean) -> Unit = {},
     onLogoutClick: () -> Unit = {},
     isDarkMode: Boolean = false,
     onDarkModeChange: (Boolean) -> Unit = {},
@@ -51,9 +52,12 @@ fun ProfileScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Membaca bahasa sistem secara otomatis buat nentuin posisi On/Off Switch
-    var isEnglish by remember {
-        mutableStateOf(AppCompatDelegate.getApplicationLocales().toLanguageTags().contains("en"))
+    // Efek samping untuk menerapkan bahasa ke OS saat state berubah
+    LaunchedEffect(isEnglish) {
+        val localeCode = if (isEnglish) "en" else "in"
+        AppCompatDelegate.setApplicationLocales(
+            LocaleListCompat.forLanguageTags(localeCode)
+        )
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -168,15 +172,7 @@ fun ProfileScreen(
                     trailingText = stringResource(id = R.string.english_label),
                     isSwitch = true,
                     switchState = isEnglish,
-                    onSwitchChange = { isEng ->
-                        isEnglish = isEng
-
-                        // Eksekusi ganti bahasa tingkat OS Android!
-                        val localeCode = if (isEng) "en" else "id"
-                        AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.forLanguageTags(localeCode)
-                        )
-                    }
+                    onSwitchChange = onLanguageChange
                 )
 
                 ProfileMenuItem(
