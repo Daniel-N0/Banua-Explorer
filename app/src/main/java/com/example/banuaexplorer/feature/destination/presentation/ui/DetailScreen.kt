@@ -57,6 +57,8 @@ fun DetailScreen(
     var realGalleryUrls by remember { mutableStateOf<List<String>>(emptyList()) }
     var publicReviews by remember { mutableStateOf<List<Review>>(emptyList()) }
     var videoUrls by remember { mutableStateOf<List<String>>(emptyList()) }
+    var instagramUrl by remember { mutableStateOf("") }
+    var whatsappUrl by remember { mutableStateOf("") }
 
     val displayReviews = if (publicReviews.isNotEmpty()) publicReviews else reviews
     val averageRating = if (displayReviews.isNotEmpty()) displayReviews.sumOf { it.rating } / displayReviews.size else 0.0
@@ -64,11 +66,11 @@ fun DetailScreen(
     val context = LocalContext.current
 
     val currentUserAuth = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-    val activeUserName = currentUserAuth?.displayName ?: "Muhammad Ilham"
+    val activeUserName = currentUserAuth?.displayName ?: "Petualang Banua"
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundGray)) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(350.dp).background(Color(0xFF2E8B57)),
+            modifier = Modifier.fillMaxWidth().height(350.dp).background(banuaGreen),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
@@ -159,8 +161,11 @@ fun DetailScreen(
                             db.collection("destinations").whereEqualTo("id", destination.id).get()
                                 .addOnSuccessListener { querySnapshot ->
                                     if (!querySnapshot.isEmpty) {
-                                        realGalleryUrls = querySnapshot.documents[0].get("galleryUrls") as? List<String> ?: emptyList()
-                                        videoUrls = querySnapshot.documents[0].get("videoUrls") as? List<String> ?: emptyList()
+                                        val doc = querySnapshot.documents[0]
+                                        realGalleryUrls = doc.get("galleryUrls") as? List<String> ?: emptyList()
+                                        videoUrls = doc.get("videoUrls") as? List<String> ?: emptyList()
+                                        instagramUrl = doc.getString("instagramUrl") ?: ""
+                                        whatsappUrl = doc.getString("whatsappUrl") ?: ""
                                     }
                                 }
 
@@ -195,7 +200,12 @@ fun DetailScreen(
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedButton(
-                            onClick = { },
+                            onClick = {
+                                if (instagramUrl.isNotBlank()) {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl))
+                                    context.startActivity(intent)
+                                }
+                            },
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = banuaGreen)
@@ -205,7 +215,12 @@ fun DetailScreen(
                             Text("Instagram", fontWeight = FontWeight.SemiBold)
                         }
                         OutlinedButton(
-                            onClick = { },
+                            onClick = {
+                                if (whatsappUrl.isNotBlank()) {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(whatsappUrl))
+                                    context.startActivity(intent)
+                                }
+                            },
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = banuaGreen)
@@ -317,7 +332,6 @@ fun DetailScreen(
         }
 
         if (selectedImage != null) {
-            // Kita asumsikan lu punya PhotoDetailScreen, tidak perlu diubah argumen isEnglish nya
             PhotoDetailScreen(imageUrl = selectedImage!!) { selectedImage = null }
         }
     }
@@ -414,13 +428,13 @@ fun ReviewInputDialog(
                     value = text, onValueChange = { text = it },
                     placeholder = { Text(stringResource(id = R.string.pengalaman_placeholder)) },
                     modifier = Modifier.fillMaxWidth(), minLines = 3,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF005959))
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
                 )
             }
         },
         confirmButton = {
             Button(onClick = { onSubmit(rating, text) }, enabled = text.isNotBlank(), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
-                Text(stringResource(id = R.string.simpan))
+                Text(stringResource(id = R.string.simpan), color = MaterialTheme.colorScheme.onPrimary)
             }
         },
         dismissButton = {

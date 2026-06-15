@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
-import com.example.banuaexplorer.ui.theme.BackgroundLight
-import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
 fun FavoriteScreen(
@@ -39,12 +37,12 @@ fun FavoriteScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundLight)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -53,7 +51,7 @@ fun FavoriteScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = BanuaGreen,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { onBackClick() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -61,19 +59,19 @@ fun FavoriteScreen(
                     text = stringResource(R.string.destinasi_favorit),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = BanuaGreen
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = BanuaGreen
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
         if (destinations.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = stringResource(R.string.belum_ada_favorit), color = Color.Gray)
+                Text(text = stringResource(R.string.belum_ada_favorit), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
             }
         } else {
             LazyColumn(
@@ -85,7 +83,7 @@ fun FavoriteScreen(
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                         Text(
                             text = stringResource(R.string.your_favorites),
-                            color = Color(0xFFF2C94C),
+                            color = MaterialTheme.colorScheme.tertiary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
                         )
@@ -93,7 +91,7 @@ fun FavoriteScreen(
                             text = stringResource(R.string.destinasi_disukai),
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            color = Color(0xFF001F1F)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -115,27 +113,27 @@ fun FavoriteScreen(
 fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)).background(BanuaGreen.copy(alpha = 0.1f)),
+                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = BanuaGreen)
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = destination.kabupaten, fontSize = 12.sp, color = Color.Gray)
+                    Text(text = destination.kabupaten, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
 

@@ -2,7 +2,7 @@ package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +16,7 @@ import java.util.UUID
 fun AddEditScreen(
     destination: Destination? = null, // Kalau null berarti tambah baru, kalau ada isinya berarti edit
     onBackClick: () -> Unit,
-    onSaveClick: (Destination) -> Unit
+    onSaveClick: (Destination) -> Unit,
 ) {
     // State untuk menampung ketikan form
     var name by remember { mutableStateOf(destination?.name ?: "") }
@@ -33,7 +33,7 @@ fun AddEditScreen(
                 title = { Text(if (isEditMode) "Edit Wisata" else "Tambah Wisata", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Batal")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Batal")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,21 +55,36 @@ fun AddEditScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nama Destinasi") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
                 value = kabupaten,
                 onValueChange = { kabupaten = it },
                 label = { Text("Kabupaten/Kota") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Kategori (Alam, Budaya, Buatan)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             OutlinedTextField(
@@ -77,7 +92,12 @@ fun AddEditScreen(
                 onValueChange = { description = it },
                 label = { Text("Deskripsi Wisata") },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 4
+                minLines = 4,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -86,7 +106,7 @@ fun AddEditScreen(
                 onClick = {
                     // Bungkus ketikan jadi object Destination baru
                     val newDest = Destination(
-                        id = destination?.id ?: java.util.UUID.randomUUID().toString(),
+                        id = destination?.id ?: UUID.randomUUID().toString(),
                         name = name,
                         kabupaten = kabupaten,
                         category = category,
@@ -105,7 +125,11 @@ fun AddEditScreen(
                     onSaveClick(newDest)
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
-                enabled = name.isNotBlank() && kabupaten.isNotBlank()
+                enabled = name.isNotBlank() && kabupaten.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(if (isEditMode) "Simpan Perubahan" else "Tambah Destinasi")
             }

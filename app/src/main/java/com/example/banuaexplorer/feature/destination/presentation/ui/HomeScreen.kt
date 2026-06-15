@@ -42,7 +42,8 @@ fun HomeScreen(
     viewModel: DestinationViewModel,
     onDestinationClick: (Destination) -> Unit,
     onProfileClick: () -> Unit,
-    onAmbassadorClick: (String) -> Unit,
+    onAmbassadorClick: (String) -> Unit, // Tetap menggunakan String (ID) sesuai best practice
+    onSeeAllAmbassadorClick: () -> Unit, // Ditambahkan dari kode temanmu
     onSeeAllClick: () -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
@@ -84,7 +85,6 @@ fun HomeScreen(
             EventBannerSection()
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Menggunakan stringResource untuk format pesan Toast
             val comingSoonFormat = stringResource(id = R.string.detail_coming_soon)
             TourPackageSection(onPackageClick = { packageName ->
                 Toast.makeText(context, String.format(comingSoonFormat, packageName), Toast.LENGTH_SHORT).show()
@@ -94,7 +94,8 @@ fun HomeScreen(
 
             AmbassadorSection(
                 ambassadors = ambassadors,
-                onAmbassadorClick = onAmbassadorClick
+                onAmbassadorClick = onAmbassadorClick,
+                onSeeAllClick = onSeeAllAmbassadorClick // Terhubung dengan baik
             )
         }
 
@@ -267,7 +268,6 @@ fun CategorySection(
     selectedCategory: String?,
     onCategoryClick: (String) -> Unit
 ) {
-    // Kategori dibiarkan sebagai nama proper, tidak di-translate agar filter logika tetap aman
     val categories = listOf("Alam", "Budaya", "Kuliner", "Sejarah", "Religi")
 
     Row(
@@ -313,211 +313,3 @@ fun CategorySection(
 @Composable
 fun DestinationRecommendationSection(destinations: List<Destination>, onDestinationClick: (Destination) -> Unit, onSeeAllClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(id = R.string.rekomendasi_destinasi), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-            Text(
-                stringResource(id = R.string.lihat_semua),
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable { onSeeAllClick() }
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (destinations.isEmpty()) {
-            Text(stringResource(id = R.string.no_destinations), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.padding(horizontal = 24.dp))
-        } else {
-            LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(destinations) { destination ->
-                    Card(modifier = Modifier.width(220.dp).clickable { onDestinationClick(destination) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                        Column {
-                            AsyncImage(
-                                model = destination.imageUrl,
-                                contentDescription = destination.name,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(120.dp),
-                                contentScale = ContentScale.Crop
-                            )
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(destination.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(destination.kabupaten, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun EventBannerSection() {
-    val dummyEvents = listOf(
-        EventItem("Festival Pasar Terapung 2026", "Siring Menara Pandang", "COMING SOON"),
-        EventItem("Pesona Budaya Banjar", "Taman Budaya Kalsel", "HARI INI"),
-        EventItem("Lomba Jukung Tradisional", "Sungai Martapura", "MINGGU DEPAN")
-    )
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = stringResource(id = R.string.upcoming_events), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(horizontal = 24.dp))
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(dummyEvents) { event ->
-                EventCard(event = event)
-            }
-        }
-    }
-}
-
-@Composable
-fun EventCard(event: EventItem) {
-    Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.primary, modifier = Modifier.width(280.dp).height(100.dp)) {
-        Row(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = event.title, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = event.location, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFC107)) {
-                Text(text = event.status, color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp))
-            }
-        }
-    }
-}
-
-data class EventItem(val title: String, val location: String, val status: String)
-
-@Composable
-fun TourPackageSection(onPackageClick: (String) -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(id = R.string.tour_packages), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(horizontal = 24.dp))
-        Spacer(modifier = Modifier.height(12.dp))
-
-        val dummyPackages = listOf("3H2M Susur Loksado" to "Rp 1.200.000", "2H1M Pasar Terapung" to "Rp 850.000")
-
-        LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(dummyPackages.size) { index ->
-                Card(
-                    modifier = Modifier
-                        .width(260.dp)
-                        .clickable { onPackageClick(dummyPackages[index].first) },
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(dummyPackages[index].first, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
-                            Text(dummyPackages[index].second, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Surface(color = Color(0xFFFFC107), shape = RoundedCornerShape(8.dp)) {
-                                Text("Detail", fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AmbassadorSection(
-    ambassadors: List<Ambassador>,
-    onAmbassadorClick: (String) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(stringResource(id = R.string.duta_daerah), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-            Text(
-                text = stringResource(id = R.string.lihat_semua),
-                modifier = Modifier.clickable { /* Buka halaman duta */ },
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(ambassadors) { ambassador ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .width(100.dp)
-                        .clickable { onAmbassadorClick(ambassador.id) }
-                ) {
-                    AsyncImage(
-                        model = ambassador.imageUrl,
-                        contentDescription = ambassador.name,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = ambassador.name,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Surface(
-                        color = Color(0xFFFFC107),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
-                        Text(
-                            text = "Banjarbaru",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun getGreetingMessage(): String {
-    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    return when (hour) {
-        in 0..10 -> stringResource(id = R.string.good_morning)
-        in 11..14 -> stringResource(id = R.string.good_afternoon)
-        in 15..17 -> stringResource(id = R.string.good_evening)
-        else -> stringResource(id = R.string.good_night)
-    }
-}
-
-fun getCurrentDate(): String {
-    val localeID = Locale("id", "ID")
-    val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy", localeID)
-    return formatter.format(Date())
-}

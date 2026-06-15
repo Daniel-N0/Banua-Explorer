@@ -64,7 +64,6 @@ fun MapScreen(viewModel: DestinationViewModel) {
     val hour = totalMinutes / 60
     val minute = totalMinutes % 60
 
-    // Format durasi menggunakan stringResource agar menyesuaikan bahasa
     val durationText = if (hour > 0) {
         String.format(stringResource(R.string.jam_menit), hour, minute)
     } else {
@@ -96,12 +95,8 @@ fun MapScreen(viewModel: DestinationViewModel) {
     }
 
     LaunchedEffect(isLocationGranted) {
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
+        val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         viewModel.updateLocationPermissionStatus(hasPermission)
-
         if (hasPermission) {
             getCurrentLocation(context) { lat, lng ->
                 viewModel.updateUserLocation(lat, lng)
@@ -115,66 +110,38 @@ fun MapScreen(viewModel: DestinationViewModel) {
     val selectedDestination by viewModel.selectedMapDestination.collectAsState()
     LaunchedEffect(selectedDestination) {
         selectedDestination?.let { dest ->
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(dest.latitude, dest.longitude), 16f
-            )
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f)
         }
     }
 
     LaunchedEffect(userLocation, selectedDestination) {
         if (userLocation != null && selectedDestination != null) {
-            viewModel.fetchRoute(
-                apiKey = BuildConfig.ORS_API_KEY,
-                start = userLocation!!,
-                end = LatLng(selectedDestination!!.latitude, selectedDestination!!.longitude)
-            )
+            viewModel.fetchRoute(apiKey = BuildConfig.ORS_API_KEY, start = userLocation!!, end = LatLng(selectedDestination!!.latitude, selectedDestination!!.longitude))
         }
     }
 
     LaunchedEffect(searchQuery, filteredDestinations) {
         if (searchQuery.isNotBlank() && filteredDestinations.size == 1) {
             val dest = filteredDestinations.first()
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(dest.latitude, dest.longitude), 16f
-            )
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f)
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = isLocationGranted)
-        ) {
+        GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState, properties = MapProperties(isMyLocationEnabled = isLocationGranted)) {
             destinations.forEach { destination ->
-                Marker(
-                    state = MarkerState(position = LatLng(destination.latitude, destination.longitude)),
-                    title = destination.name,
-                    snippet = destination.kabupaten
-                )
+                Marker(state = MarkerState(position = LatLng(destination.latitude, destination.longitude)), title = destination.name, snippet = destination.kabupaten)
             }
-
-            if (routePoints.isNotEmpty()) {
-                Polyline(points = routePoints, color = Color.Blue, width = 12f)
-            }
+            if (routePoints.isNotEmpty()) { Polyline(points = routePoints, color = MaterialTheme.colorScheme.primary, width = 12f) }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 40.dp, start = 24.dp, end = 24.dp)
-                .align(Alignment.TopCenter),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 40.dp, start = 24.dp, end = 24.dp).align(Alignment.TopCenter), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { viewModel.onSearchQueryChange(it) },
                 placeholder = { Text(stringResource(R.string.cari_di_peta), fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White, focusedContainerColor = Color.White,
-                    unfocusedBorderColor = Color.Transparent, focusedBorderColor = Color.Transparent
-                ),
+                colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedBorderColor = Color.Transparent, focusedBorderColor = Color.Transparent),
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().shadow(elevation = 8.dp, shape = RoundedCornerShape(24.dp))
@@ -182,90 +149,37 @@ fun MapScreen(viewModel: DestinationViewModel) {
         }
 
         if (routeDistance > 0) {
-            Card(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 120.dp, start = 24.dp, end = 24.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
+            Card(modifier = Modifier.align(Alignment.TopCenter).padding(top = 120.dp, start = 24.dp, end = 24.dp).fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.informasi_perjalanan),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    selectedDestination?.let {
-                        Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF2B2D42))
-                        Spacer(modifier = Modifier.height(4.dp))
-                    }
-
-                    selectedDestination?.let { destination ->
+                    Text(text = stringResource(R.string.informasi_perjalanan), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    selectedDestination?.let { dest ->
+                        Text(text = dest.name, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
                         Spacer(modifier = Modifier.height(12.dp))
-                        Button(
-                            onClick = {
-                                val uri = Uri.parse("google.navigation:q=${destination.latitude},${destination.longitude}")
-                                val intent = Intent(Intent.ACTION_VIEW, uri).apply { setPackage("com.google.android.apps.maps") }
-                                if (intent.resolveActivity(context.packageManager) != null) {
-                                    context.startActivity(intent)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(text = stringResource(R.string.buka_di_google_maps), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Button(onClick = {
+                            val uri = Uri.parse("google.navigation:q=${dest.latitude},${dest.longitude}")
+                            val intent = Intent(Intent.ACTION_VIEW, uri).apply { setPackage("com.google.android.apps.maps") }
+                            if (intent.resolveActivity(context.packageManager) != null) context.startActivity(intent)
+                        }, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(24.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
+                            Text(text = stringResource(R.string.buka_di_google_maps), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
-
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = String.format(stringResource(R.string.jarak_km), distanceKm),
-                            color = Color.DarkGray, fontSize = 14.sp
-                        )
-                        Text(
-                            text = String.format(stringResource(R.string.estimasi_waktu), durationText),
-                            color = Color(0xFFB8860B), fontSize = 14.sp, fontWeight = FontWeight.Bold
-                        )
+                        Text(text = String.format(stringResource(R.string.jarak_km), distanceKm), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+                        Text(text = String.format(stringResource(R.string.estimasi_waktu), durationText), color = MaterialTheme.colorScheme.tertiary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
 
         Column(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 110.dp)) {
-            Text(
-                text = stringResource(R.string.di_sekitar_anda),
-                fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF001F1F),
-                modifier = Modifier
-                    .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-
+            Text(text = stringResource(R.string.di_sekitar_anda), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp).background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 4.dp))
             if (filteredDestinations.isNotEmpty()) {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(filteredDestinations) { dest ->
-                        MapDestinationCard(
-                            destination = dest,
-                            onClick = { viewModel.selectDestinationForMap(dest) }
-                        )
-                    }
+                LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    items(filteredDestinations) { dest -> MapDestinationCard(dest, onClick = { viewModel.selectDestinationForMap(dest) }) }
                 }
             } else if (searchQuery.isNotBlank()) {
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).background(Color.White, RoundedCornerShape(16.dp)).padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = stringResource(R.string.destinasi_tidak_ditemukan), color = Color.Gray)
-                }
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)).padding(16.dp), contentAlignment = Alignment.Center) { Text(text = stringResource(R.string.destinasi_tidak_ditemukan), color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         }
     }
@@ -273,32 +187,15 @@ fun MapScreen(viewModel: DestinationViewModel) {
 
 @Composable
 fun MapDestinationCard(destination: Destination, onClick: () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier.width(280.dp).clickable { onClick() }
-    ) {
+    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), modifier = Modifier.width(280.dp).clickable { onClick() }) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            }
+            Box(modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) { Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = destination.kabupaten, fontSize = 11.sp, color = Color.Gray)
+                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
+                Text(text = destination.kabupaten, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(8.dp))
-                Surface(color = Color(0xFFF2C94C).copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp)) {
-                    Text(
-                        text = stringResource(R.string.arahkan),
-                        color = Color(0xFFB8860B), fontSize = 10.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                    )
-                }
+                Surface(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp)) { Text(text = stringResource(R.string.arahkan), color = MaterialTheme.colorScheme.onTertiaryContainer, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp, 4.dp)) }
             }
         }
     }

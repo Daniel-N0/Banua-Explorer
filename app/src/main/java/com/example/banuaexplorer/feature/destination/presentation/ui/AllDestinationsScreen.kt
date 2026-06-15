@@ -36,8 +36,6 @@ fun AllDestinationsScreen(
     onDestinationClick: (Destination) -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
-    val banuaGreen = Color(0xFF006666)
-    val backgroundGray = Color(0xFFF8F9FA)
 
     var searchQuery by remember { mutableStateOf("") }
     var selectedRegion by remember { mutableStateOf("Kalimantan Selatan") }
@@ -56,20 +54,20 @@ fun AllDestinationsScreen(
 
     Scaffold(
         topBar = {
-            Surface(shadowElevation = 8.dp, color = banuaGreen, modifier = Modifier.clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))) {
+            Surface(shadowElevation = 8.dp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
                     Row(modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White, modifier = Modifier.padding(start = 16.dp).clip(CircleShape).clickable { onBackClick() }.padding(8.dp))
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 16.dp).clip(CircleShape).clickable { onBackClick() }.padding(8.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = stringResource(R.string.eksplor_wisata), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(text = stringResource(R.string.eksplor_wisata), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                     }
 
                     Box(modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { expandedRegion = true }) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(String.format(stringResource(R.string.explore_banua), selectedRegion), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.White)
+                            Text(String.format(stringResource(R.string.explore_banua), selectedRegion), color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         }
                         DropdownMenu(expanded = expandedRegion, onDismissRequest = { expandedRegion = false }) {
                             regions.forEach { region -> DropdownMenuItem(text = { Text(region) }, onClick = { selectedRegion = region; expandedRegion = false }) }
@@ -79,10 +77,10 @@ fun AllDestinationsScreen(
                     OutlinedTextField(
                         value = searchQuery, onValueChange = { searchQuery = it },
                         placeholder = { Text(stringResource(R.string.cari_nama_tempat), fontSize = 14.sp) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = banuaGreen) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
                         shape = RoundedCornerShape(24.dp),
-                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White, unfocusedBorderColor = Color.Transparent, focusedBorderColor = Color.Transparent),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedBorderColor = Color.Transparent, focusedBorderColor = Color.Transparent),
                         singleLine = true
                     )
 
@@ -92,11 +90,11 @@ fun AllDestinationsScreen(
                         categories.forEach { category ->
                             val isSelected = category == selectedCategory
                             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { selectedCategory = if (selectedCategory == category) null else category }) {
-                                Surface(shape = RoundedCornerShape(16.dp), color = if (isSelected) Color.White else Color.White.copy(alpha = 0.2f), shadowElevation = if (isSelected) 4.dp else 0.dp, modifier = Modifier.size(56.dp)) {
-                                    Box(contentAlignment = Alignment.Center) { Text(text = category.take(1), color = if (isSelected) banuaGreen else Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+                                Surface(shape = RoundedCornerShape(16.dp), color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surface.copy(alpha = 0.2f), shadowElevation = if (isSelected) 4.dp else 0.dp, modifier = Modifier.size(56.dp)) {
+                                    Box(contentAlignment = Alignment.Center) { Text(text = category.take(1), color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(text = category, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = Color.White)
+                                Text(text = category, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
                     }
@@ -104,9 +102,9 @@ fun AllDestinationsScreen(
             }
         }
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().background(backgroundGray).padding(padding)) {
+        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
             if (filteredList.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(stringResource(R.string.destinasi_tidak_ditemukan), color = Color.Gray) }
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(stringResource(R.string.destinasi_tidak_ditemukan), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) }
             } else {
                 LazyVerticalGrid(columns = GridCells.Fixed(2), contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(filteredList) { destination -> DestinationGridItem(destination, onDestinationClick) }
@@ -120,19 +118,19 @@ fun AllDestinationsScreen(
 fun DestinationGridItem(destination: Destination, onClick: (Destination) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick(destination) },
-        shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(2.dp)
+        shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
-            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(Color(0xFF006666).copy(alpha = 0.1f)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF006666))
+            Box(modifier = Modifier.fillMaxWidth().height(120.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = Color.Gray)
+                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = destination.kabupaten, fontSize = 11.sp, color = Color.Gray, maxLines = 1)
+                    Text(text = destination.kabupaten, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1)
                 }
             }
         }

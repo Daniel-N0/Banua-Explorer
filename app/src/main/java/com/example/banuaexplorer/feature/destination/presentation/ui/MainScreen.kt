@@ -1,11 +1,6 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.example.banuaexplorer.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -13,10 +8,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -31,6 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
@@ -38,8 +34,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
+import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
+import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
@@ -54,8 +51,6 @@ fun MainScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val context = LocalContext.current
-
-    // isEnglish DIHAPUS, karena sudah pakai sistem bawaan
     val isDarkMode by themeViewModel.isDarkMode.collectAsState()
 
     val showBottomBar = currentRoute in listOf(
@@ -65,251 +60,105 @@ fun MainScreen(
         Screen.Partner.route
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         NavHost(
             navController = navController,
             startDestination = Screen.Splash.route,
             modifier = Modifier.fillMaxSize(),
-            enterTransition = {
-                fadeIn(animationSpec = tween(700)) + scaleIn(initialScale = 0.95f, animationSpec = tween(800))
-            },
+            enterTransition = { fadeIn(animationSpec = tween(700)) + scaleIn(initialScale = 0.95f, animationSpec = tween(800)) },
             exitTransition = { fadeOut(animationSpec = tween(700)) },
-            popEnterTransition = {
-                fadeIn(animationSpec = tween(700)) + scaleIn(initialScale = 0.95f, animationSpec = tween(800))
-            },
+            popEnterTransition = { fadeIn(animationSpec = tween(700)) + scaleIn(initialScale = 0.95f, animationSpec = tween(800)) },
             popExitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
-
             composable(Screen.Splash.route) {
                 val currentUser by authViewModel.currentUser.collectAsState()
-
                 LaunchedEffect(Unit) {
                     kotlinx.coroutines.delay(1500)
-                    if (currentUser != null) {
-                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                    } else {
-                        navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                    }
+                    if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
+                    else navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
                 }
-
-                Box(
-                    modifier = Modifier.fillMaxSize().background(Color(0xFFFFFFFF)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.banua_explorer),
-                        contentDescription = "Logo Banua Explorer",
-                        modifier = Modifier.size(300.dp)
-                    )
+                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
+                    Image(painter = painterResource(id = R.drawable.banua_explorer), contentDescription = null, modifier = Modifier.size(300.dp))
                 }
             }
 
             composable(Screen.Login.route) {
                 val isLoading by authViewModel.isLoading.collectAsState()
-                val isLoginSuccess by authViewModel.isLoginSuccess.collectAsState()
-                val errorMessage by authViewModel.errorMessage.collectAsState()
-                val currentUser by authViewModel.currentUser.collectAsState()
-
-                LaunchedEffect(currentUser) {
-                    if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
-                }
-
-                LaunchedEffect(isLoginSuccess) {
-                    if (isLoginSuccess) {
-                        Toast.makeText(context, "Login Berhasil!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
-                        authViewModel.resetState()
-                    }
-                }
-
-                LaunchedEffect(errorMessage) {
-                    errorMessage?.let {
-                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                        authViewModel.resetState()
-                    }
-                }
-
                 LoginScreen(
-                    // isEnglish = isEnglish DIHAPUS
                     onLoginClick = { email, password -> authViewModel.login(email, password) },
                     onNavigateToRegister = { navController.navigate(Screen.Register.route) },
-                    onForgotPasswordClick = { emailTxt ->
-                        authViewModel.resetPassword(emailTxt) { _, message -> Toast.makeText(context, message, Toast.LENGTH_LONG).show() }
-                    }
+                    onForgotPasswordClick = { authViewModel.resetPassword(it) { _, msg -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show() } }
                 )
-
-                if (isLoading) Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
+                if (isLoading) Dialog(onDismissRequest = {}) { CircularProgressIndicator(color = MaterialTheme.colorScheme.primary) }
             }
 
             composable(Screen.Register.route) {
-                val isLoading by authViewModel.isLoading.collectAsState()
-                val isLoginSuccess by authViewModel.isLoginSuccess.collectAsState()
-                val errorMessage by authViewModel.errorMessage.collectAsState()
-
-                LaunchedEffect(isLoginSuccess) {
-                    if (isLoginSuccess) {
-                        Toast.makeText(context, "Akun Berhasil Dibuat!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
-                        authViewModel.resetState()
-                    }
-                }
-
-                LaunchedEffect(errorMessage) {
-                    errorMessage?.let {
-                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                        authViewModel.resetState()
-                    }
-                }
-
                 RegisterScreen(
-                    // isEnglish = isEnglish DIHAPUS
                     onRegisterClick = { name, email, password -> authViewModel.register(name, email, password) },
                     onNavigateToLogin = { navController.popBackStack() }
                 )
-
-                if (isLoading) Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
             }
 
             composable(Screen.Home.route) {
                 HomeScreen(
-                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
-                    onDestinationClick = { destination ->
-                        viewModel.selectDestination(destination)
-                        navController.navigate(Screen.Detail.route)
-                    },
+                    onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) },
                     onProfileClick = { navController.navigate(Screen.Profile.route) },
-                    onAmbassadorClick = {
-                        navController.navigate(Screen.Partner.route) {
-                            popUpTo(Screen.Home.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
+                    onAmbassadorClick = { navController.navigate("duta_detail/${it.id}") },
+                    onSeeAllAmbassadorClick = { navController.navigate(Screen.Partner.route) },
                     onSeeAllClick = { navController.navigate(Screen.AllDestinations.route) }
                 )
             }
 
             composable(Screen.Favorite.route) {
-                FavoriteScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    viewModel = viewModel,
-                    onDestinationClick = { destination ->
-                        viewModel.selectDestination(destination)
-                        navController.navigate(Screen.Detail.route)
-                    }
-                )
+                FavoriteScreen(viewModel = viewModel, onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) })
             }
 
-            composable(Screen.Map.route) {
-                // isEnglish = isEnglish DIHAPUS
-                MapScreen(viewModel = viewModel)
-            }
+            composable(Screen.Map.route) { MapScreen(viewModel = viewModel) }
 
             composable(Screen.Partner.route) {
-                PartnerScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    viewModel = viewModel,
-                    onNavigateToDutaDetail = { id -> navController.navigate("duta_detail/$id") }
-                )
+                PartnerScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }, onNavigateToDutaDetail = { navController.navigate("duta_detail/$it") })
             }
 
-            composable("duta_detail/{dutaId}") { backStackEntry ->
-                val id = backStackEntry.arguments?.getString("dutaId") ?: "duta-001"
-                DutaDetailScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    ambassadorId = id,
-                    onBackClick = { navController.popBackStack() }
-                )
+            composable("duta_detail/{dutaId}") {
+                DutaDetailScreen(ambassadorId = it.arguments?.getString("dutaId") ?: "", onBackClick = { navController.popBackStack() })
             }
 
             composable(Screen.Detail.route) {
-                val destinations by viewModel.destinations.collectAsState()
-                val favoriteDestinations by viewModel.favoriteDestinations.collectAsState()
-                val selectedDestination by viewModel.selectedDestination.collectAsState()
-
-                val currentDestination = selectedDestination ?: destinations.firstOrNull() ?: Destination(
-                    id = "dummy_1", name = "Memuat...", kabupaten = "Memuat...",
-                    description = "Memuat...", category = "Wisata", imageUrl = "",
-                    latitude = 0.0, longitude = 0.0, dutaPick = "", facilities = "",
-                    rating = 0.0, reviewCount = 0, galleryUrls = emptyList()
-                )
-
-                val currentReviews by viewModel.getReviews(currentDestination.id).collectAsState(initial = emptyList())
-                val isFavorite = favoriteDestinations.any { it.id == currentDestination.id }
-
+                val dest by viewModel.selectedDestination.collectAsState()
+                val favs by viewModel.favoriteDestinations.collectAsState()
+                val reviews by viewModel.getReviews(dest?.id ?: "").collectAsState(emptyList())
                 DetailScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    destination = currentDestination,
-                    reviews = currentReviews,
-                    isFavorite = isFavorite,
-                    onFavoriteClick = { viewModel.toggleFavorite(currentDestination) },
+                    destination = dest ?: Destination(),
+                    reviews = reviews,
+                    isFavorite = favs.any { f -> f.id == dest?.id },
+                    onFavoriteClick = { dest?.let { viewModel.toggleFavorite(it) } },
                     onBackClick = { navController.popBackStack() },
-                    onRouteClick = {
-                        viewModel.selectDestinationForMap(currentDestination)
-                        navController.navigate(Screen.Map.route)
-                    },
-                    onSaveReview = { review -> viewModel.addReview(review) },
-                    onDeleteReview = { review -> viewModel.deleteReview(review) }
+                    onRouteClick = { viewModel.selectDestinationForMap(dest!!); navController.navigate(Screen.Map.route) },
+                    onSaveReview = { viewModel.addReview(it) },
+                    onDeleteReview = { viewModel.deleteReview(it) }
                 )
             }
 
             composable(Screen.Profile.route) {
                 val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-                val activeName = currentUser?.displayName ?: "Petualang Banua"
-                val activeEmail = currentUser?.email ?: "email@kosong.com"
-                val activePhotoUrl = currentUser?.photoUrl?.toString() ?: ""
-                var uploadedPhotoUrl by remember { mutableStateOf(activePhotoUrl) }
-
                 ProfileScreen(
                     viewModel = viewModel,
                     onBackClick = { navController.navigateUp() },
                     isDarkMode = isDarkMode,
                     onDarkModeChange = { themeViewModel.setDarkMode(it) },
                     onEditProfileClick = { navController.navigate(Screen.EditProfile.route) },
-                    onLogoutClick = {
-                        authViewModel.logout()
-                        navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
-                    },
-                    userName = activeName,
-                    userEmail = activeEmail,
-                    profilePictureUrl = uploadedPhotoUrl,
-                    onPhotoSelected = { uri ->
-                        Toast.makeText(context, "Mulai upload...", Toast.LENGTH_SHORT).show()
-                        authViewModel.uploadProfilePhoto(uri) { isSuccess, resultUrl ->
-                            if (isSuccess) {
-                                Toast.makeText(context, "Upload Sukses!", Toast.LENGTH_SHORT).show()
-                                uploadedPhotoUrl = resultUrl
-                            } else {
-                                Toast.makeText(context, "Gagal: $resultUrl", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
+                    onLogoutClick = { authViewModel.logout(); navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } } },
+                    userName = currentUser?.displayName ?: "Petualang",
+                    userEmail = currentUser?.email ?: "",
+                    profilePictureUrl = currentUser?.photoUrl?.toString() ?: "",
+                    onPhotoSelected = { authViewModel.uploadProfilePhoto(it) { s, r -> if (s) Toast.makeText(context, "Sukses!", Toast.LENGTH_SHORT).show() } }
                 )
             }
 
-            composable(Screen.EditProfile.route) {
-                EditProfileScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    viewModel = viewModel,
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
-
+            composable(Screen.EditProfile.route) { EditProfileScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }) }
             composable(Screen.AllDestinations.route) {
-                AllDestinationsScreen(
-                    // isEnglish = isEnglish DIHAPUS
-                    viewModel = viewModel,
-                    onBackClick = { navController.popBackStack() },
-                    onDestinationClick = { destination ->
-                        viewModel.selectDestination(destination)
-                        navController.navigate(Screen.Detail.route)
-                    }
-                )
+                AllDestinationsScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }, onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) })
             }
         }
 
@@ -327,9 +176,7 @@ fun MainScreen(
 @Composable
 fun CustomBottomNavigation(navController: NavHostController, currentRoute: String?) {
     NavigationBar(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(30.dp)),
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).clip(RoundedCornerShape(30.dp)),
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
@@ -339,28 +186,13 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
             NavItem(stringResource(R.string.nav_map), Icons.Default.LocationOn, Screen.Map.route),
             NavItem(stringResource(R.string.nav_partner), Icons.Default.Person, Screen.Partner.route)
         )
-
         items.forEach { item ->
-            val isSelected = currentRoute == item.route
             NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(Screen.Home.route) { inclusive = false }
-                            launchSingleTop = true
-                        }
-                    }
-                },
+                selected = currentRoute == item.route,
+                onClick = { if (currentRoute != item.route) navController.navigate(item.route) { popUpTo(Screen.Home.route) { inclusive = false }; launchSingleTop = true } },
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(item.title) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    selectedTextColor = Color(0xFF006666),
-                    indicatorColor = Color(0xFF006666),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray
-                )
+                colors = NavigationBarItemDefaults.colors(selectedIconColor = MaterialTheme.colorScheme.onPrimary, selectedTextColor = MaterialTheme.colorScheme.primary, indicatorColor = MaterialTheme.colorScheme.primary, unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant, unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }
     }

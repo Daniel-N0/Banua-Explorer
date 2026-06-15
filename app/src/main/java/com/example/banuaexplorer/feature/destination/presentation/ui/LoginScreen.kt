@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -33,63 +35,92 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit = {},
     onForgotPasswordClick: (String) -> Unit
 ) {
-    val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFFFFFFF)
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(backgroundGray).padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(modifier = Modifier.size(150.dp), contentAlignment = Alignment.Center) {
-            Image(painter = painterResource(R.drawable.banua_explorer), contentDescription = null, modifier = Modifier.size(150.dp))
+        Box(
+            modifier = Modifier.size(150.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.banua_explorer),
+                contentDescription = null,
+                modifier = Modifier.size(150.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        Text(text = stringResource(R.string.selamat_datang), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF001F1F))
+        Text(
+            text = stringResource(R.string.selamat_datang),
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = stringResource(R.string.silakan_login), fontSize = 14.sp, color = Color.Gray, modifier = Modifier.padding(horizontal = 16.dp))
+        Text(
+            text = stringResource(R.string.silakan_login),
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
 
         Spacer(modifier = Modifier.height(48.dp))
 
         OutlinedTextField(
-            value = email, onValueChange = { email = it },
+            value = email,
+            onValueChange = { email = it },
             label = { Text(stringResource(R.string.email_label)) },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = banuaGreen) },
-            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = banuaGreen, focusedLabelColor = banuaGreen),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), singleLine = true
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = password, onValueChange = { password = it },
+            value = password,
+            onValueChange = { password = it },
             label = { Text(stringResource(R.string.password_label)) },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = banuaGreen) },
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = null, tint = Color.Gray)
+                    Icon(imageVector = image, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
-            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = banuaGreen, focusedLabelColor = banuaGreen),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary
+            ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), singleLine = true
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true
         )
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             TextButton(
-                onClick = { onForgotPasswordClick(email) },
-                modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.End)
+                onClick = { onForgotPasswordClick(email) }
             ) {
-                Text(text = stringResource(R.string.lupa_password), color = banuaGreen, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.lupa_password), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -98,19 +129,20 @@ fun LoginScreen(
         Button(
             onClick = { onLoginClick(email, password) },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = banuaGreen),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text(stringResource(R.string.masuk), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.masuk), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.belum_punya_akun), color = Color.Gray)
+            Text(stringResource(R.string.belum_punya_akun), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
                 text = stringResource(R.string.daftar_di_sini),
-                color = banuaGreen, fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )
         }
