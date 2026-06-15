@@ -1,3 +1,107 @@
 <resources>
     <string name="app_name">BanuaExplorer</string>
+    <string name="my_profile">Profil Saya</string>
+    <string name="dark_mode">Mode Gelap</string>
+    <string name="language">Ganti Bahasa</string>
+    <string name="logout">Keluar</string>
+
+    <string name="nav_home">Beranda</string>
+    <string name="nav_favorite">Favorit</string>
+    <string name="nav_map">Peta</string>
+    <string name="nav_partner">Mitra</string>
+    <string name="edit_profile">Edit Profil</string>
+    <string name="english_label">Indonesia</string>
+
+    <string name="greeting_petualang">Petualang</string>
+    <string name="explore_banua">Jelajahi wisata di %s</string>
+    <string name="search_placeholder">Cari destinasi wisata...</string>
+    <string name="rekomendasi_destinasi">Rekomendasi Destinasi</string>
+    <string name="lihat_semua">Lihat Semua</string>
+    <string name="no_destinations">Tidak ada destinasi ditemukan.</string>
+    <string name="upcoming_events">Event Mendatang</string>
+    <string name="tour_packages">Penawaran Paket Wisata</string>
+    <string name="duta_daerah">Duta Daerah</string>
+    <string name="good_morning">Selamat Pagi</string>
+    <string name="good_afternoon">Selamat Siang</string>
+    <string name="good_evening">Selamat Sore</string>
+    <string name="good_night">Selamat Malam</string>
+    <string name="detail_coming_soon">Detail %s akan segera hadir!</string>
+
+    <string name="minggu_buka">Minggu : Buka 24 Jam</string>
+    <string name="galeri_foto">Galeri Foto</string>
+    <string name="memuat_galeri">Memuat galeri...</string>
+    <string name="ulasan_count">%d ULASAN</string>
+    <string name="berikan_ulasan">Berikan Ulasan</string>
+    <string name="belum_ada_ulasan">Belum ada ulasan. Jadilah yang pertama!</string>
+    <string name="video_relevan">Video Relevan</string>
+    <string name="rute_perjalanan">Rute Perjalanan</string>
+    <string name="baru_saja">Baru saja</string>
+    <string name="tulis_ulasan">Tulis Ulasan</string>
+    <string name="edit_ulasan">Edit Ulasan</string>
+    <string name="pengalaman_placeholder">Bagaimana pengalamanmu di sini?</string>
+    <string name="simpan">Simpan</string>
+    <string name="batal">Batal</string>
+
+    <string name="partnership_title">Partnership &amp; Mitra</string>
+    <string name="collabs_label">COLLABORATIONS</string>
+    <string name="membangun_banua">Membangun Banua</string>
+    <string name="bersama_mitra">Bersama Mitra</string>
+    <string name="mitra_sponsor">Mitra &amp; Sponsor</string>
+    <string name="daftar_anggota_resmi">DAFTAR ANGGOTA resmi</string>
+    <string name="duta_pariwisata_kebudayaan">Duta Pariwisata &amp; Kebudayaan</string>
+    <string name="followers_count">%s Followers</string>
+    <string name="lihat_bio">Lihat Bio</string>
+
+    <string name="profil_duta">Profil Duta</string>
+    <string name="tidak_ada_nama">Tidak ada nama</string>
+    <string name="bio_tidak_tersedia">Bio tidak tersedia.</string>
+    <string name="stat_aktivitas">Aktivitas</string>
+    <string name="stat_kampanye">Kampanye</string>
+    <string name="stat_pengikut">Pengikut</string>
+    <string name="tentang">Tentang</string>
+    <string name="kunjungi_instagram">Kunjungi Instagram</string>
+
+    <string name="destinasi_favorit">Destinasi Favorit</string>
+    <string name="belum_ada_favorit">Belum ada destinasi favorit</string>
+    <string name="your_favorites">YOUR FAVORITES</string>
+    <string name="destinasi_disukai">Destinasi yang Kamu Sukai</string>
+
+    <string name="eksplor_wisata">Eksplor Wisata Banua</string>
+    <string name="cari_nama_tempat">Cari nama tempat...</string>
+    <string name="destinasi_tidak_ditemukan">Destinasi tidak ditemukan</string>
+
+    <string name="cari_di_peta">Cari destinasi di peta...</string>
+    <string name="informasi_perjalanan">Informasi Perjalanan</string>
+    <string name="buka_di_google_maps">Buka di Google Maps</string>
+    <string name="jarak_km">Jarak: %.1f km</string>
+    <string name="estimasi_waktu">Estimasi: %s</string>
+    <string name="di_sekitar_anda">Di Sekitar Anda</string>
+    <string name="arahkan">Arahkan</string>
+    <string name="jam_menit">±%1$d jam %2$d menit</string>
+    <string name="hanya_menit">±%d menit</string>
+
+    <string name="selamat_datang">Selamat Datang!</string>
+    <string name="silakan_login">Silakan login untuk menjelajahi keindahan Banua.</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="lupa_password">Lupa Password?</string>
+    <string name="masuk">Masuk</string>
+    <string name="belum_punya_akun">Belum punya akun? </string>
+    <string name="daftar_di_sini">Daftar di sini</string>
+
+    <string name="buat_akun">Buat Akun</string>
+    <string name="daftar_mulai">Daftar untuk mulai menjelajah Banua.</string>
+    <string name="nama_lengkap">Nama Lengkap</string>
+    <string name="daftar_sekarang">Daftar Sekarang</string>
+    <string name="sudah_punya_akun">Sudah punya akun? </string>
+    <string name="login_di_sini">Login di sini</string>
+
+    <string name="edit_profil">Edit Profil</string>
+    <string name="nomor_telepon">Nomor Telepon</string>
+    <string name="kabupaten_kota">Kabupaten/Kota</string>
+    <string name="simpan_perubahan">Simpan Perubahan</string>
+
+    <string name="rating_bintang">Rating: %d Bintang</string>
+    <string name="komentar">Komentar</string>
+    <string name="kirim">Kirim</string>
 </resources>

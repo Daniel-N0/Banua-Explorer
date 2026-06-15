@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate // <-- IMPORT SAKTI
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,10 +25,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource // <-- IMPORT INI
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat // <-- IMPORT SAKTI
 import coil.compose.AsyncImage
+import com.example.banuaexplorer.R // <-- IMPORT R RESOURCE LU
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 
 @Composable
@@ -40,16 +44,16 @@ fun ProfileScreen(
     isDarkMode: Boolean = false,
     onDarkModeChange: (Boolean) -> Unit = {},
     onPhotoSelected: (Uri) -> Unit = {},
-    // --- 3 PARAMETER BARU BUAT NANGKEP DATA FIREBASE ---
     userName: String = "Petualang",
     userEmail: String = "",
     profilePictureUrl: String = ""
 ) {
 
-    // (State viewModel.userProfile dihapus karena kita pakai data dari Firebase sekarang)
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    var selectedImageUri by remember {
-        mutableStateOf<Uri?>(null)
+    // Membaca bahasa sistem secara otomatis buat nentuin posisi On/Off Switch
+    var isEnglish by remember {
+        mutableStateOf(AppCompatDelegate.getApplicationLocales().toLanguageTags().contains("en"))
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -57,7 +61,7 @@ fun ProfileScreen(
     ) { uri ->
         if (uri != null) {
             selectedImageUri = uri
-            onPhotoSelected(uri) // Memicu upload ke Cloudinary di MainScreen
+            onPhotoSelected(uri)
         }
     }
 
@@ -83,8 +87,9 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.width(16.dp))
 
+            // --- SUDAH PAKAI STRING RESOURCE ---
             Text(
-                text = "Profil Saya",
+                text = stringResource(id = R.string.my_profile),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -96,9 +101,7 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Box(
-                contentAlignment = Alignment.BottomEnd
-            ) {
+            Box(contentAlignment = Alignment.BottomEnd) {
 
                 Box(
                     modifier = Modifier
@@ -106,42 +109,19 @@ fun ProfileScreen(
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
                         .clickable {
-                            galleryLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
+                            galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         },
                     contentAlignment = Alignment.Center
                 ) {
-
                     when {
-                        // 1. Prioritaskan gambar yang baru dipilih dari galeri (Biar kelihatan instan)
                         selectedImageUri != null -> {
-                            AsyncImage(
-                                model = selectedImageUri,
-                                contentDescription = "Foto Profil",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            AsyncImage(model = selectedImageUri, contentDescription = "Foto Profil", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                         }
-                        // 2. Kalau gak ada, pakai gambar dari Link Cloudinary/Firebase
                         profilePictureUrl.isNotBlank() -> {
-                            AsyncImage(
-                                model = profilePictureUrl,
-                                contentDescription = "Foto Profil",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            AsyncImage(model = profilePictureUrl, contentDescription = "Foto Profil", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                         }
-                        // 3. Kalau akun baru dan belum ada foto, kasih ikon default
                         else -> {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Avatar",
-                                modifier = Modifier.size(60.dp),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
+                            Icon(Icons.Default.Person, contentDescription = "Avatar", modifier = Modifier.size(60.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                         }
                     }
                 }
@@ -149,77 +129,59 @@ fun ProfileScreen(
                 Surface(
                     color = MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
-                    modifier = Modifier
-                        .padding(bottom = 4.dp, end = 4.dp)
-                        .size(32.dp)
-                        .clickable {
-                            galleryLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        }
+                    modifier = Modifier.padding(bottom = 4.dp, end = 4.dp).size(32.dp).clickable {
+                        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Profile",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .padding(6.dp)
-                            .size(16.dp)
-                    )
+                    Icon(Icons.Default.Edit, contentDescription = "Edit Profile", tint = Color.White, modifier = Modifier.padding(6.dp).size(16.dp))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = userName, // <-- Diubah pakai data Firebase
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Text(
-                text = userEmail, // <-- Diubah pakai data Firebase
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
+            Text(text = userName, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = userEmail, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
 
-            Column(
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
 
+                // --- SUDAH PAKAI STRING RESOURCE SEMUA ---
                 ProfileMenuItem(
                     icon = Icons.Outlined.Person,
-                    title = "Edit Profil",
+                    title = stringResource(id = R.string.edit_profile),
                     showArrow = true,
                     onClick = onEditProfileClick
                 )
 
                 ProfileMenuItem(
                     icon = Icons.Outlined.Language,
-                    title = "Ganti Bahasa",
-                    trailingText = "Indonesia",
-                    showArrow = true,
-                    onClick = onLanguageClick
+                    title = stringResource(id = R.string.language),
+                    trailingText = stringResource(id = R.string.english_label),
+                    isSwitch = true,
+                    switchState = isEnglish,
+                    onSwitchChange = { isEng ->
+                        isEnglish = isEng
+
+                        // Eksekusi ganti bahasa tingkat OS Android!
+                        val localeCode = if (isEng) "en" else "id"
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(localeCode)
+                        )
+                    }
                 )
 
                 ProfileMenuItem(
                     icon = Icons.Outlined.DarkMode,
-                    title = "Mode Gelap",
+                    title = stringResource(id = R.string.dark_mode),
                     isSwitch = true,
                     switchState = isDarkMode,
                     onSwitchChange = onDarkModeChange
@@ -232,27 +194,19 @@ fun ProfileScreen(
         Surface(
             color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onLogoutClick() }
+            modifier = Modifier.fillMaxWidth().clickable { onLogoutClick() }
         ) {
-
             Row(
                 modifier = Modifier.padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = "Keluar",
-                    tint = MaterialTheme.colorScheme.error
-                )
-
+                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Keluar", tint = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.width(8.dp))
 
+                // --- SUDAH PAKAI STRING RESOURCE ---
                 Text(
-                    text = "Logout",
+                    text = stringResource(id = R.string.logout),
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 16.sp
@@ -273,82 +227,45 @@ fun ProfileMenuItem(
     onSwitchChange: (Boolean) -> Unit = {},
     onClick: () -> Unit = {}
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .then(
-                if (!isSwitch)
-                    Modifier.clickable { onClick() }
-                else Modifier
-            )
+            .then(if (!isSwitch) Modifier.clickable { onClick() } else Modifier)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
         Row(verticalAlignment = Alignment.CenterVertically) {
-
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                    ),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(icon, contentDescription = title, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
-
             Spacer(modifier = Modifier.width(16.dp))
-
-            Text(
-                text = title,
-                fontWeight = FontWeight.Medium,
-                fontSize = 15.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Text(title, fontWeight = FontWeight.Medium, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
+        Row(verticalAlignment = Alignment.CenterVertically) {
             trailingText?.let {
-                Text(
-                    text = it,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-
+                Text(it, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
             if (isSwitch) {
-
                 Switch(
-                    checked = switchState,
-                    onCheckedChange = onSwitchChange,
+                    checked = switchState, // Menggunakan state dari argumen
+                    onCheckedChange = onSwitchChange, // Lempar balik ke atas
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.surface,
                         checkedTrackColor = MaterialTheme.colorScheme.primary
                     )
                 )
-
             } else if (showArrow) {
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "Detail",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                )
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Detail", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
             }
         }
     }

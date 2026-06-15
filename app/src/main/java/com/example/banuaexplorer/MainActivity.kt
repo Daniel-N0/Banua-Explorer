@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,7 +32,7 @@ import com.example.banuaexplorer.feature.destination.presentation.viewmodel.Them
 import com.example.banuaexplorer.ui.theme.BanuaExplorerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     // 1. ViewModel untuk Destinasi
     private val viewModel: DestinationViewModel by viewModels {

@@ -33,11 +33,13 @@ import com.example.banuaexplorer.ui.theme.BanuaGreen
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.banuaexplorer.R
 
 @Composable
 fun PartnerScreen(
     viewModel: DestinationViewModel,
-    onNavigateToDutaDetail: (String) -> Unit // <-- Colokan utama navigasi sudah terpasang
+    onNavigateToDutaDetail: (String) -> Unit
 ) {
     val partners by viewModel.partners.collectAsState()
     val ambassadors by viewModel.ambassadors.collectAsState()
@@ -60,7 +62,7 @@ fun PartnerScreen(
             groupName = selectedGroup!!,
             ambassadorList = filteredAmbassadors,
             onBackClick = { selectedGroup = null },
-            onNavigateToDutaDetail = onNavigateToDutaDetail // <-- Diterusin ke halaman detail kelompok
+            onNavigateToDutaDetail = onNavigateToDutaDetail
         )
     } else {
         Column(
@@ -68,7 +70,6 @@ fun PartnerScreen(
                 .fillMaxSize()
                 .background(Color(0xFFF8F9FA))
         ) {
-            // Header Utama
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,12 +80,11 @@ fun PartnerScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = BanuaGreen)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Partnership & Mitra", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
+                    Text(stringResource(R.string.partnership_title), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
                 }
                 Icon(Icons.Default.Search, contentDescription = "Search", tint = BanuaGreen)
             }
 
-            // Konten Scrollable
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(horizontal = 24.dp),
@@ -94,10 +94,10 @@ fun PartnerScreen(
             ) {
                 item(span = { GridItemSpan(2) }) {
                     Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                        Text("COLLABORATIONS", color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(stringResource(R.string.collabs_label), color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Membangun Banua", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFF001F1F))
-                        Text("Bersama Mitra", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = BanuaGreen)
+                        Text(stringResource(R.string.membangun_banua), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFF001F1F))
+                        Text(stringResource(R.string.bersama_mitra), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = BanuaGreen)
                     }
                 }
 
@@ -107,12 +107,11 @@ fun PartnerScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Duta Daerah", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        Text("Lihat Semua", color = BanuaGreen, fontSize = 12.sp)
+                        Text(stringResource(R.string.duta_daerah), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(stringResource(R.string.lihat_semua), color = BanuaGreen, fontSize = 12.sp)
                     }
                 }
 
-                // DAFTAR KELOMPOK DUTA
                 item(span = { GridItemSpan(2) }) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -126,7 +125,6 @@ fun PartnerScreen(
                                 onClick = { selectedGroup = "Duta Kota Banjarbaru" }
                             )
                         }
-
                         item {
                             DutaGroupCard(
                                 title = "Duta Kota Banjarmasin",
@@ -139,16 +137,12 @@ fun PartnerScreen(
                 }
 
                 item(span = { GridItemSpan(2) }) {
-                    Text("Mitra & Sponsor", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+                    Text(stringResource(R.string.mitra_sponsor), fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
                 }
 
-                items(partners) { partner ->
-                    SponsorCard(partner)
-                }
+                items(partners) { partner -> SponsorCard(partner) }
 
-                item(span = { GridItemSpan(2) }) {
-                    Spacer(modifier = Modifier.height(100.dp))
-                }
+                item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(100.dp)) }
             }
         }
     }
@@ -159,7 +153,7 @@ fun DutaDetailGroupScreen(
     groupName: String,
     ambassadorList: List<Ambassador>,
     onBackClick: () -> Unit,
-    onNavigateToDutaDetail: (String) -> Unit // <--- TAMBAHIN (String) DI SINI AJA BRO!
+    onNavigateToDutaDetail: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -172,25 +166,14 @@ fun DutaDetailGroupScreen(
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = BanuaGreen,
-                modifier = Modifier.clickable { onBackClick() }
-            )
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = BanuaGreen, modifier = Modifier.clickable { onBackClick() })
             Spacer(modifier = Modifier.width(16.dp))
             Text(groupName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = BanuaGreen)
         }
 
-        Column(
-            modifier = Modifier.padding(
-                start = 24.dp,
-                end = 24.dp,
-                top = 0.dp,
-                bottom = 16.dp
-            )) {
-            Text("DAFTAR ANGGOTA resmi", color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 11.sp)
-            Text("Duta Pariwisata & Kebudayaan", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF001F1F))
+        Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 0.dp, bottom = 16.dp)) {
+            Text(stringResource(R.string.daftar_anggota_resmi), color = Color(0xFFF2C94C), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            Text(stringResource(R.string.duta_pariwisata_kebudayaan), fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF001F1F))
         }
 
         LazyVerticalGrid(
@@ -201,15 +184,9 @@ fun DutaDetailGroupScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             items(ambassadorList) { ambassador ->
-                IndividualAmbassadorCard(
-                    ambassador = ambassador,
-                    onBioClick = { onNavigateToDutaDetail(ambassador.id) } // <-- Balikin jadi gini
-                )
+                IndividualAmbassadorCard(ambassador = ambassador, onBioClick = { onNavigateToDutaDetail(ambassador.id) })
             }
-
-            item(span = { GridItemSpan(2) }) {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
+            item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(32.dp)) }
         }
     }
 }
@@ -220,51 +197,22 @@ fun IndividualAmbassadorCard(ambassador: Ambassador, onBioClick: () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth() // <-- Card sudah TIDAK ADA clickable
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(
-                model = ambassador.imageUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
+                model = ambassador.imageUrl, contentDescription = null,
+                modifier = Modifier.size(90.dp).clip(CircleShape).background(Color.LightGray),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = ambassador.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = "${ambassador.followers} Followers",
-                fontSize = 12.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
-            )
-
+            Text(ambassador.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(String.format(stringResource(R.string.followers_count), ambassador.followers.toString()), fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 2.dp, bottom = 8.dp))
             Surface(
-                color = BanuaGreen.copy(alpha = 0.1f),
-                shape = CircleShape,
-                modifier = Modifier.clickable { onBioClick() } // <-- Tombol Lihat Bio AKAN BISA DI KLIK
+                color = BanuaGreen.copy(alpha = 0.1f), shape = CircleShape,
+                modifier = Modifier.clickable { onBioClick() }
             ) {
-                Text(
-                    "Lihat Bio",
-                    color = BanuaGreen,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                )
+                Text(stringResource(R.string.lihat_bio), color = BanuaGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp))
             }
         }
     }
@@ -273,34 +221,16 @@ fun IndividualAmbassadorCard(ambassador: Ambassador, onBioClick: () -> Unit) {
 @Composable
 fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () -> Unit) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier
-            .width(310.dp)
-            .clickable { onClick() }
+        shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), modifier = Modifier.width(310.dp).clickable { onClick() }
     ) {
         Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .background(Color.LightGray)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().height(140.dp).background(Color.LightGray)) {
                 Surface(
-                    color = BanuaGreen,
-                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(bottom = 12.dp)
+                    color = BanuaGreen, shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                    modifier = Modifier.align(Alignment.BottomStart).padding(bottom = 12.dp)
                 ) {
-                    Text(
-                        text = badge,
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                    )
+                    Text(badge, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
                 }
             }
             Column(modifier = Modifier.padding(16.dp)) {
@@ -315,42 +245,18 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, onClick: () ->
 @Composable
 fun SponsorCard(partner: Partner) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
+        shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), modifier = Modifier.fillMaxWidth().aspectRatio(1f)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF004D4D)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    partner.name.take(1),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+            Box(modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFF004D4D)), contentAlignment = Alignment.Center) {
+                Text(partner.name.take(1), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = partner.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 13.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 2
-            )
+            Text(partner.name, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center, maxLines = 2)
         }
     }
 }

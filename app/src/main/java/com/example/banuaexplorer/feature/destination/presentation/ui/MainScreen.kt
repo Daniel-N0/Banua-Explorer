@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.banuaexplorer.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -38,7 +39,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-// Import Models & ViewModels
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
@@ -55,10 +55,9 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
     val context = LocalContext.current
 
-    // State untuk Dark Mode
+    // isEnglish DIHAPUS, karena sudah pakai sistem bawaan
     val isDarkMode by themeViewModel.isDarkMode.collectAsState()
 
-    // Cek kapan Bottom Navbar harus muncul
     val showBottomBar = currentRoute in listOf(
         Screen.Home.route,
         Screen.Favorite.route,
@@ -66,18 +65,15 @@ fun MainScreen(
         Screen.Partner.route
     )
 
-    // Box Utama pembungkus layar
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background) // Adaptif Dark Mode
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Layar TV (NavHost)
         NavHost(
             navController = navController,
-            startDestination = Screen.Splash.route, // Mulai dari Splash Screen Lu
+            startDestination = Screen.Splash.route,
             modifier = Modifier.fillMaxSize(),
-            // Transisi Animasi Lu
             enterTransition = {
                 fadeIn(animationSpec = tween(700)) + scaleIn(initialScale = 0.95f, animationSpec = tween(800))
             },
@@ -88,42 +84,30 @@ fun MainScreen(
             popExitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
 
-            // ==========================================
-            // --- RUTE SPLASH SCREEN ---
-            // ==========================================
             composable(Screen.Splash.route) {
                 val currentUser by authViewModel.currentUser.collectAsState()
 
                 LaunchedEffect(Unit) {
                     kotlinx.coroutines.delay(1500)
                     if (currentUser != null) {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Splash.route) { inclusive = true }
-                        }
+                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
                     } else {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Splash.route) { inclusive = true }
-                        }
+                        navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
                     }
                 }
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFFFFFFF )),
+                    modifier = Modifier.fillMaxSize().background(Color(0xFFFFFFFF)),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.banua_explorer), // Pakai nama file yang baru
+                        painter = painterResource(id = R.drawable.banua_explorer),
                         contentDescription = "Logo Banua Explorer",
-                        modifier = Modifier.size(300.dp) // Ukuran logonya, bisa lu gede-kecilin
+                        modifier = Modifier.size(300.dp)
                     )
                 }
             }
 
-            // ==========================================
-            // --- RUTE LOGIN & REGISTER ---
-            // ==========================================
             composable(Screen.Login.route) {
                 val isLoading by authViewModel.isLoading.collectAsState()
                 val isLoginSuccess by authViewModel.isLoginSuccess.collectAsState()
@@ -131,19 +115,13 @@ fun MainScreen(
                 val currentUser by authViewModel.currentUser.collectAsState()
 
                 LaunchedEffect(currentUser) {
-                    if (currentUser != null) {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    }
+                    if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                 }
 
                 LaunchedEffect(isLoginSuccess) {
                     if (isLoginSuccess) {
                         Toast.makeText(context, "Login Berhasil!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                         authViewModel.resetState()
                     }
                 }
@@ -156,18 +134,15 @@ fun MainScreen(
                 }
 
                 LoginScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     onLoginClick = { email, password -> authViewModel.login(email, password) },
                     onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                     onForgotPasswordClick = { emailTxt ->
-                        authViewModel.resetPassword(emailTxt) { _, message ->
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                        }
+                        authViewModel.resetPassword(emailTxt) { _, message -> Toast.makeText(context, message, Toast.LENGTH_LONG).show() }
                     }
                 )
 
-                if (isLoading) {
-                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
-                }
+                if (isLoading) Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
             }
 
             composable(Screen.Register.route) {
@@ -178,9 +153,7 @@ fun MainScreen(
                 LaunchedEffect(isLoginSuccess) {
                     if (isLoginSuccess) {
                         Toast.makeText(context, "Akun Berhasil Dibuat!", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+                        navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                         authViewModel.resetState()
                     }
                 }
@@ -193,22 +166,17 @@ fun MainScreen(
                 }
 
                 RegisterScreen(
-                    onRegisterClick = { name, email, password ->
-                        authViewModel.register(name, email, password)
-                    },
+                    // isEnglish = isEnglish DIHAPUS
+                    onRegisterClick = { name, email, password -> authViewModel.register(name, email, password) },
                     onNavigateToLogin = { navController.popBackStack() }
                 )
 
-                if (isLoading) {
-                    Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
-                }
+                if (isLoading) Dialog(onDismissRequest = { }) { CircularProgressIndicator(color = Color(0xFF005959)) }
             }
 
-            // ==========================================
-            // --- RUTE UTAMA (HOME, MAP, FAVORITE, PARTNER) ---
-            // ==========================================
             composable(Screen.Home.route) {
                 HomeScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
                     onDestinationClick = { destination ->
                         viewModel.selectDestination(destination)
@@ -228,6 +196,7 @@ fun MainScreen(
 
             composable(Screen.Favorite.route) {
                 FavoriteScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
                     onDestinationClick = { destination ->
                         viewModel.selectDestination(destination)
@@ -236,55 +205,47 @@ fun MainScreen(
                 )
             }
 
-            composable(Screen.Map.route) { MapScreen(viewModel = viewModel) }
+            composable(Screen.Map.route) {
+                // isEnglish = isEnglish DIHAPUS
+                MapScreen(viewModel = viewModel)
+            }
+
             composable(Screen.Partner.route) {
                 PartnerScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
-                    onNavigateToDutaDetail = { id ->
-                        navController.navigate("duta_detail/$id") // <--- Navigasi bawa ID!
-                    }
+                    onNavigateToDutaDetail = { id -> navController.navigate("duta_detail/$id") }
                 )
             }
 
-            // Tambahin ini di bawah composable rute-rute lu yang lain
             composable("duta_detail/{dutaId}") { backStackEntry ->
-                // Tangkap ID yang dibawa dari rute
                 val id = backStackEntry.arguments?.getString("dutaId") ?: "duta-001"
-
                 DutaDetailScreen(
-                    ambassadorId = id, // <--- INI DIA YANG DITAGIH SAMA ANDROID STUDIO!
+                    // isEnglish = isEnglish DIHAPUS
+                    ambassadorId = id,
                     onBackClick = { navController.popBackStack() }
                 )
             }
 
-            // ==========================================
-            // --- RUTE DETAIL DESTINASI ---
-            // ==========================================
-            // ==========================================
-            // --- RUTE DETAIL DESTINASI ---
-            // ==========================================
             composable(Screen.Detail.route) {
                 val destinations by viewModel.destinations.collectAsState()
                 val favoriteDestinations by viewModel.favoriteDestinations.collectAsState()
                 val selectedDestination by viewModel.selectedDestination.collectAsState()
 
-                // 1. Ambil data destinasi yang sedang aktif
                 val currentDestination = selectedDestination ?: destinations.firstOrNull() ?: Destination(
                     id = "dummy_1", name = "Memuat...", kabupaten = "Memuat...",
                     description = "Memuat...", category = "Wisata", imageUrl = "",
                     latitude = 0.0, longitude = 0.0, dutaPick = "", facilities = "",
                     rating = 0.0, reviewCount = 0, galleryUrls = emptyList()
-
                 )
 
-                // 2. Ambil data review dari database lokal (ROOM) via ViewModel
                 val currentReviews by viewModel.getReviews(currentDestination.id).collectAsState(initial = emptyList())
-
                 val isFavorite = favoriteDestinations.any { it.id == currentDestination.id }
 
                 DetailScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     destination = currentDestination,
-                    reviews = currentReviews, // <--- Data review disuntikkan ke sini
+                    reviews = currentReviews,
                     isFavorite = isFavorite,
                     onFavoriteClick = { viewModel.toggleFavorite(currentDestination) },
                     onBackClick = { navController.popBackStack() },
@@ -292,22 +253,12 @@ fun MainScreen(
                         viewModel.selectDestinationForMap(currentDestination)
                         navController.navigate(Screen.Map.route)
                     },
-                    // 3. Eksekusi fungsi ADD / EDIT (BREAD)
-                    onSaveReview = { review ->
-                        viewModel.addReview(review)
-                    },
-                    // 4. Eksekusi fungsi DELETE (BREAD)
-                    onDeleteReview = { review ->
-                        viewModel.deleteReview(review)
-                    }
+                    onSaveReview = { review -> viewModel.addReview(review) },
+                    onDeleteReview = { review -> viewModel.deleteReview(review) }
                 )
             }
 
-            // ==========================================
-            // --- RUTE PROFIL & EDIT PROFIL ---
-            // ==========================================
             composable(Screen.Profile.route) {
-                // Ambil Data User Firebase
                 val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
                 val activeName = currentUser?.displayName ?: "Petualang Banua"
                 val activeEmail = currentUser?.email ?: "email@kosong.com"
@@ -315,19 +266,15 @@ fun MainScreen(
                 var uploadedPhotoUrl by remember { mutableStateOf(activePhotoUrl) }
 
                 ProfileScreen(
-                    viewModel = viewModel, // Dari Daniel
+                    viewModel = viewModel,
                     onBackClick = { navController.navigateUp() },
-                    isDarkMode = isDarkMode, // Dari Daniel
-                    onDarkModeChange = { themeViewModel.setDarkMode(it) }, // Dari Daniel
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = { themeViewModel.setDarkMode(it) },
                     onEditProfileClick = { navController.navigate(Screen.EditProfile.route) },
-                    onLanguageClick = { /* Nanti */ },
                     onLogoutClick = {
                         authViewModel.logout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } }
                     },
-                    // Data & Upload Cloudinary Lu
                     userName = activeName,
                     userEmail = activeEmail,
                     profilePictureUrl = uploadedPhotoUrl,
@@ -347,6 +294,7 @@ fun MainScreen(
 
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
                     onBackClick = { navController.popBackStack() }
                 )
@@ -354,6 +302,7 @@ fun MainScreen(
 
             composable(Screen.AllDestinations.route) {
                 AllDestinationsScreen(
+                    // isEnglish = isEnglish DIHAPUS
                     viewModel = viewModel,
                     onBackClick = { navController.popBackStack() },
                     onDestinationClick = { destination ->
@@ -364,14 +313,11 @@ fun MainScreen(
             }
         }
 
-        // Navbar Melayang (Floating Bubble Navbar)
         AnimatedVisibility(
             visible = showBottomBar,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
             exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 5.dp)
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp)
         ) {
             CustomBottomNavigation(navController = navController, currentRoute = currentRoute)
         }
@@ -384,14 +330,14 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(30.dp)),
-        containerColor = MaterialTheme.colorScheme.surface, // Adaptif Dark Mode
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
         val items = listOf(
-            NavItem("Home", Icons.Default.Home, Screen.Home.route),
-            NavItem("Favorite", Icons.Default.FavoriteBorder, Screen.Favorite.route),
-            NavItem("Map", Icons.Default.LocationOn, Screen.Map.route),
-            NavItem("Partner", Icons.Default.Person, Screen.Partner.route)
+            NavItem(stringResource(R.string.nav_home), Icons.Default.Home, Screen.Home.route),
+            NavItem(stringResource(R.string.nav_favorite), Icons.Default.FavoriteBorder, Screen.Favorite.route),
+            NavItem(stringResource(R.string.nav_map), Icons.Default.LocationOn, Screen.Map.route),
+            NavItem(stringResource(R.string.nav_partner), Icons.Default.Person, Screen.Partner.route)
         )
 
         items.forEach { item ->
@@ -419,6 +365,5 @@ fun CustomBottomNavigation(navController: NavHostController, currentRoute: Strin
         }
     }
 }
-
 
 data class NavItem(val title: String, val icon: ImageVector, val route: String)

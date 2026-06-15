@@ -1,0 +1,107 @@
+<resources>
+    <string name="app_name">BanuaExplorer</string>
+    <string name="my_profile">My Profile</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language">Language</string>
+    <string name="logout">Log Out</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_favorite">Favorite</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_partner">Partner</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="english_label">English</string>
+
+    <string name="greeting_petualang">Explorer</string>
+    <string name="explore_banua">Explore tourism in %s</string>
+    <string name="search_placeholder">Search destinations...</string>
+    <string name="rekomendasi_destinasi">Recommended Destinations</string>
+    <string name="lihat_semua">See All</string>
+    <string name="no_destinations">No destinations found.</string>
+    <string name="upcoming_events">Upcoming Events</string>
+    <string name="tour_packages">Tour Packages</string>
+    <string name="duta_daerah">Local Ambassadors</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
+    <string name="good_night">Good Night</string>
+    <string name="detail_coming_soon">Details for %s are coming soon!</string>
+
+    <string name="minggu_buka">Sunday : Open 24 Hours</string>
+    <string name="galeri_foto">Photo Gallery</string>
+    <string name="memuat_galeri">Loading gallery...</string>
+    <string name="ulasan_count">%d REVIEWS</string>
+    <string name="berikan_ulasan">Write a Review</string>
+    <string name="belum_ada_ulasan">No reviews yet. Be the first!</string>
+    <string name="video_relevan">Related Videos</string>
+    <string name="rute_perjalanan">Get Directions</string>
+    <string name="baru_saja">Just now</string>
+    <string name="tulis_ulasan">Write Review</string>
+    <string name="edit_ulasan">Edit Review</string>
+    <string name="pengalaman_placeholder">How was your experience here?</string>
+    <string name="simpan">Save</string>
+    <string name="batal">Cancel</string>
+
+    <string name="partnership_title">Partnerships</string>
+    <string name="collabs_label">COLLABORATIONS</string>
+    <string name="membangun_banua">Building Banua</string>
+    <string name="bersama_mitra">With Partners</string>
+    <string name="mitra_sponsor">Partners &amp; Sponsors</string>
+    <string name="daftar_anggota_resmi">OFFICIAL MEMBER LIST</string>
+    <string name="duta_pariwisata_kebudayaan">Tourism &amp; Culture Ambassadors</string>
+    <string name="followers_count">%s Followers</string>
+    <string name="lihat_bio">View Bio</string>
+
+    <string name="profil_duta">Ambassador Profile</string>
+    <string name="tidak_ada_nama">No name available</string>
+    <string name="bio_tidak_tersedia">Bio is not available.</string>
+    <string name="stat_aktivitas">Activities</string>
+    <string name="stat_kampanye">Campaigns</string>
+    <string name="stat_pengikut">Followers</string>
+    <string name="tentang">About</string>
+    <string name="kunjungi_instagram">Visit Instagram</string>
+
+    <string name="destinasi_favorit">Favorite Destinations</string>
+    <string name="belum_ada_favorit">No favorite destinations yet</string>
+    <string name="your_favorites">YOUR FAVORITES</string>
+    <string name="destinasi_disukai">Destinations You Like</string>
+
+    <string name="eksplor_wisata">Explore Banua Tourism</string>
+    <string name="cari_nama_tempat">Search places...</string>
+    <string name="destinasi_tidak_ditemukan">Destination not found</string>
+
+    <string name="cari_di_peta">Search destinations on map...</string>
+    <string name="informasi_perjalanan">Trip Information</string>
+    <string name="buka_di_google_maps">Open in Google Maps</string>
+    <string name="jarak_km">Distance: %.1f km</string>
+    <string name="estimasi_waktu">ETA: %s</string>
+    <string name="di_sekitar_anda">Around You</string>
+    <string name="arahkan">Directions</string>
+    <string name="jam_menit">±%1$d hr %2$d min</string>
+    <string name="hanya_menit">±%d min</string>
+
+    <string name="selamat_datang">Welcome!</string>
+    <string name="silakan_login">Please log in to explore the beauty of Banua.</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="lupa_password">Forgot Password?</string>
+    <string name="masuk">Sign In</string>
+    <string name="belum_punya_akun">Don\'t have an account? </string>
+    <string name="daftar_di_sini">Register here</string>
+
+    <string name="buat_akun">Create Account</string>
+    <string name="daftar_mulai">Register to start exploring Banua.</string>
+    <string name="nama_lengkap">Full Name</string>
+    <string name="daftar_sekarang">Register Now</string>
+    <string name="sudah_punya_akun">Already have an account? </string>
+    <string name="login_di_sini">Log in here</string>
+
+    <string name="edit_profil">Edit Profile</string>
+    <string name="nomor_telepon">Phone Number</string>
+    <string name="kabupaten_kota">City/Regency</string>
+    <string name="simpan_perubahan">Save Changes</string>
+
+    <string name="rating_bintang">Rating: %d Stars</string>
+    <string name="komentar">Comment</string>
+    <string name="kirim">Send</string>
+</resources>

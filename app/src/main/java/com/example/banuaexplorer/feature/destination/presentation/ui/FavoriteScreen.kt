@@ -17,18 +17,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.ui.theme.BackgroundLight
 import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
-fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
-                   onDestinationClick: (Destination) -> Unit = {}) {
+fun FavoriteScreen(
+    viewModel: DestinationViewModel,
+    onBackClick: () -> Unit = {},
+    onDestinationClick: (Destination) -> Unit = {}
+) {
     val destinations by viewModel.favoriteDestinations.collectAsState()
 
     Column(
@@ -36,11 +41,10 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
             .fillMaxSize()
             .background(BackgroundLight)
     ) {
-        // --- HEADER (Identik dengan Partner Screen) ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White) // Tetap putih agar bersih
+                .background(Color.White)
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -54,7 +58,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Destinasi Favorit",
+                    text = stringResource(R.string.destinasi_favorit),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = BanuaGreen
@@ -67,16 +71,9 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
             )
         }
 
-        // --- DAFTAR KONTEN ---
         if (destinations.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Belum ada destinasi favorit",
-                    color = Color.Gray
-                )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = stringResource(R.string.belum_ada_favorit), color = Color.Gray)
             }
         } else {
             LazyColumn(
@@ -84,17 +81,16 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Header tambahan jika ingin gaya Collaboration (Opsional)
                 item {
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                         Text(
-                            "YOUR FAVORITES",
+                            text = stringResource(R.string.your_favorites),
                             color = Color(0xFFF2C94C),
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
                         )
                         Text(
-                            "Destinasi yang Kamu Sukai",
+                            text = stringResource(R.string.destinasi_disukai),
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             color = Color(0xFF001F1F)
@@ -105,16 +101,11 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                 items(destinations) { destination ->
                     FavoriteCard(
                         destination = destination,
-                        onClick = {
-                            onDestinationClick(destination)
-                        }
+                        onClick = { onDestinationClick(destination) }
                     )
                 }
 
-                // Spacer agar item terakhir tidak tertutup Navbar
-                item {
-                    Spacer(modifier = Modifier.height(100.dp))
-                }
+                item { Spacer(modifier = Modifier.height(100.dp)) }
             }
         }
     }
@@ -126,22 +117,11 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Gambar Placeholder (Bisa diganti AsyncImage Coil)
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(BanuaGreen.copy(alpha = 0.1f)),
+                modifier = Modifier.size(80.dp).clip(RoundedCornerShape(12.dp)).background(BanuaGreen.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Default.LocationOn, contentDescription = null, tint = BanuaGreen)
@@ -150,13 +130,7 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = destination.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
@@ -165,13 +139,7 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
                 }
             }
 
-            // Tombol Love Merah
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = null,
-                tint = Color(0xFFE53935),
-                modifier = Modifier.padding(8.dp)
-            )
+            Icon(imageVector = Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.padding(8.dp))
         }
     }
 }

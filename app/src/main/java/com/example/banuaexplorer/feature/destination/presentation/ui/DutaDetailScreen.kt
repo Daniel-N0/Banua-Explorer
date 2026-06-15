@@ -29,18 +29,20 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.banuaexplorer.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DutaDetailScreen(
-    ambassadorId: String, // <--- KUNCI UTAMA: ID Duta dari layar sebelumnya
+    ambassadorId: String,
     onBackClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val banuaGreen = MaterialTheme.colorScheme.primary
 
-    // State penampung data dari Firebase
+    // Teks default ambil dari stringResource juga kalau bisa
     var name by remember { mutableStateOf("Memuat...") }
     var title by remember { mutableStateOf("...") }
     var imageUrl by remember { mutableStateOf("") }
@@ -50,39 +52,37 @@ fun DutaDetailScreen(
     var campaigns by remember { mutableStateOf("0") }
     var instagramUrl by remember { mutableStateOf("") }
 
-    // Tembak Firebase pas layar dibuka
+    val errorNoName = stringResource(R.string.tidak_ada_nama)
+    val errorNoBio = stringResource(R.string.bio_tidak_tersedia)
+
     LaunchedEffect(ambassadorId) {
         if (ambassadorId.isNotEmpty()) {
             val db = Firebase.firestore
             db.collection("ambassadors")
-                .document(ambassadorId) // Langsung tembak ke ID dokumennya
+                .document(ambassadorId)
                 .get()
                 .addOnSuccessListener { doc ->
                     if (doc.exists()) {
-                        name = doc.getString("name") ?: "Tidak ada nama"
+                        name = doc.getString("name") ?: errorNoName
                         title = doc.getString("title") ?: "Putra Pariwisata"
-                        imageUrl = doc.getString("imageUrl") ?: "" // <--- PASTIIN INI ADA!
-                        instagramUrl = doc.getString("instagramUrl") ?: "https://www.instagram.com/ilham_akunlu"
-                        bio = doc.getString("bio") ?: "Bio tidak tersedia."
+                        imageUrl = doc.getString("imageUrl") ?: ""
+                        instagramUrl = doc.getString("instagramUrl") ?: "https://www.instagram.com/"
+                        bio = doc.getString("bio") ?: errorNoBio
                         followers = doc.getLong("followers")?.toString() ?: "0"
                         activities = doc.getLong("activities")?.toString() ?: "0"
                         campaigns = doc.getLong("campaigns")?.toString() ?: "0"
                     }
                 }
-                .addOnFailureListener { e ->
-                    name = "Error: ${e.message}"
-                }
+                .addOnFailureListener { e -> name = "Error: ${e.message}" }
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profil Duta", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.profil_duta), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
+                    IconButton(onClick = onBackClick) { Icon(Icons.Default.ArrowBack, contentDescription = "Kembali") }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -101,95 +101,50 @@ fun DutaDetailScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- FOTO PROFIL ---
             Box(
-                modifier = Modifier
-                    .size(160.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
+                modifier = Modifier.size(160.dp).clip(CircleShape).background(Color.LightGray),
                 contentAlignment = Alignment.Center
             ) {
                 if (imageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Foto $name",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    AsyncImage(model = imageUrl, contentDescription = "Foto $name", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- NAMA & GELAR ---
-            Text(
-                text = name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = title.uppercase(),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = banuaGreen,
-                modifier = Modifier.padding(top = 4.dp),
-                textAlign = TextAlign.Center
-            )
+            Text(text = name, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(text = title.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = banuaGreen, modifier = Modifier.padding(top = 4.dp), textAlign = TextAlign.Center)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- STATISTIK ---
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ProfileStatItem(value = activities, label = "Aktivitas", icon = Icons.Default.Star)
-                ProfileStatItem(value = campaigns, label = "Kampanye", icon = Icons.Default.Language)
-                ProfileStatItem(value = followers, label = "Pengikut", icon = Icons.Default.CameraAlt) // Ikon beda dikit gpp
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                ProfileStatItem(value = activities, label = stringResource(R.string.stat_aktivitas), icon = Icons.Default.Star)
+                ProfileStatItem(value = campaigns, label = stringResource(R.string.stat_kampanye), icon = Icons.Default.Language)
+                ProfileStatItem(value = followers, label = stringResource(R.string.stat_pengikut), icon = Icons.Default.CameraAlt)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- BIO / ADVOKASI ---
             Surface(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 8.dp
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
-                ) {
-                    Text(
-                        text = "Tentang",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+                    Text(text = stringResource(R.string.tentang), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = bio,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 22.sp,
-                        textAlign = TextAlign.Justify
-                    )
+                    Text(text = bio, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 22.sp, textAlign = TextAlign.Justify)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl))
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(50.dp), // Height 50.dp biar enak dipencet
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(instagramUrl))) },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
                         shape = RoundedCornerShape(25.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = banuaGreen) // Sesuaikan dengan warna tema lu
+                        colors = ButtonDefaults.buttonColors(containerColor = banuaGreen)
                     ) {
-                        Text("Kunjungi Instagram", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.kunjungi_instagram), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(40.dp))
