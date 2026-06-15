@@ -86,7 +86,7 @@
     <string name="password_label">Password</string>
     <string name="lupa_password">Forgot Password?</string>
     <string name="masuk">Sign In</string>
-    <string name="belum_punya_akun">Don\'t have an account? </string>
+    <string name="belum_punya_akun">Dont have an account? </string>
     <string name="daftar_di_sini">Register here</string>
 
     <string name="buat_akun">Create Account</string>
