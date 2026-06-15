@@ -56,7 +56,7 @@ fun RegisterScreen(
         Text(
             text = stringResource(R.string.daftar_mulai),
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -134,7 +134,7 @@ fun RegisterScreen(
         Row {
             Text(
                 text = stringResource(R.string.sudah_punya_akun),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = stringResource(R.string.login_di_sini),

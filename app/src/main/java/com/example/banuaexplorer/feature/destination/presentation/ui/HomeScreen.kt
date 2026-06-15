@@ -140,16 +140,23 @@ fun HomeHeader(onProfileIconClick: () -> Unit, searchQuery: String, onSearchChan
 
 @Composable
 fun CategorySection(selectedCategory: String?, onCategoryClick: (String) -> Unit) {
-    val categories = listOf("Alam", "Budaya", "Kuliner", "Sejarah", "Religi")
+    val categories = listOf(
+        "Alam" to R.string.cat_alam,
+        "Budaya" to R.string.cat_budaya,
+        "Kuliner" to R.string.cat_kuliner,
+        "Sejarah" to R.string.cat_sejarah,
+        "Religi" to R.string.cat_religi
+    )
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        categories.forEach { category ->
-            val isSelected = category == selectedCategory
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCategoryClick(category) }) {
+        categories.forEach { (categoryKey, stringResId) ->
+            val isSelected = categoryKey == selectedCategory
+            val categoryLabel = stringResource(id = stringResId)
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCategoryClick(categoryKey) }) {
                 Surface(shape = RoundedCornerShape(16.dp), color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface, shadowElevation = 2.dp, modifier = Modifier.size(56.dp)) {
-                    Box(contentAlignment = Alignment.Center) { Text(text = category.take(1), color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+                    Box(contentAlignment = Alignment.Center) { Text(text = categoryLabel.take(1), color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = category, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                Text(text = categoryLabel, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -262,5 +269,5 @@ fun getGreetingMessage(): String {
 }
 
 fun getCurrentDate(): String {
-    return SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID")).format(Date())
+    return SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault()).format(Date())
 }

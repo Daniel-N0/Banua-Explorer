@@ -29,6 +29,9 @@ import com.example.banuaexplorer.datastore.ThemePreference
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModelFactory
 
+import com.example.banuaexplorer.datastore.LanguagePreference
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.LanguageViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.LanguageViewModelFactory
 import com.example.banuaexplorer.ui.theme.BanuaExplorerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -50,6 +53,13 @@ class MainActivity : AppCompatActivity() {
     private val themeViewModel: ThemeViewModel by viewModels {
         ThemeViewModelFactory(
             ThemePreference(applicationContext)
+        )
+    }
+
+    // 4. ViewModel untuk Language
+    private val languageViewModel: LanguageViewModel by viewModels {
+        LanguageViewModelFactory(
+            LanguagePreference(applicationContext)
         )
     }
 
@@ -84,7 +94,8 @@ class MainActivity : AppCompatActivity() {
                     MainScreen(
                         viewModel = viewModel,
                         authViewModel = authViewModel,
-                        themeViewModel = themeViewModel
+                        themeViewModel = themeViewModel,
+                        languageViewModel = languageViewModel
                     )
                 }
             }

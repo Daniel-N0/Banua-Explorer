@@ -39,19 +39,22 @@ import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import com.example.banuaexplorer.feature.destination.presentation.viewmodel.LanguageViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
 
 @Composable
 fun MainScreen(
     viewModel: DestinationViewModel,
     authViewModel: AuthViewModel,
-    themeViewModel: ThemeViewModel
+    themeViewModel: ThemeViewModel,
+    languageViewModel: LanguageViewModel
 ) {
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
     val context = LocalContext.current
     val isDarkMode by themeViewModel.isDarkMode.collectAsState()
+    val isEnglish by languageViewModel.isEnglish.collectAsState()
 
     val showBottomBar = currentRoute in listOf(
         Screen.Home.route,
@@ -77,13 +80,31 @@ fun MainScreen(
                     if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
                     else navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
                 }
-                Box(modifier = Modifier.fillMaxSize().background(Color.White), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
                     Image(painter = painterResource(id = R.drawable.banua_explorer), contentDescription = null, modifier = Modifier.size(300.dp))
                 }
             }
 
             composable(Screen.Login.route) {
                 val isLoading by authViewModel.isLoading.collectAsState()
+                val errorMessage by authViewModel.errorMessage.collectAsState()
+                val currentUser by authViewModel.currentUser.collectAsState()
+
+                LaunchedEffect(currentUser) {
+                    if (currentUser != null) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                }
+
+                LaunchedEffect(errorMessage) {
+                    errorMessage?.let {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                        authViewModel.resetState()
+                    }
+                }
+
                 LoginScreen(
                     onLoginClick = { email, password -> authViewModel.login(email, password) },
                     onNavigateToRegister = { navController.navigate(Screen.Register.route) },
@@ -93,10 +114,30 @@ fun MainScreen(
             }
 
             composable(Screen.Register.route) {
+                val isLoading by authViewModel.isLoading.collectAsState()
+                val errorMessage by authViewModel.errorMessage.collectAsState()
+                val currentUser by authViewModel.currentUser.collectAsState()
+
+                LaunchedEffect(currentUser) {
+                    if (currentUser != null) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    }
+                }
+
+                LaunchedEffect(errorMessage) {
+                    errorMessage?.let {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                        authViewModel.resetState()
+                    }
+                }
+
                 RegisterScreen(
                     onRegisterClick = { name, email, password -> authViewModel.register(name, email, password) },
                     onNavigateToLogin = { navController.popBackStack() }
                 )
+                if (isLoading) Dialog(onDismissRequest = {}) { CircularProgressIndicator(color = MaterialTheme.colorScheme.primary) }
             }
 
             composable(Screen.Home.route) {
@@ -127,17 +168,24 @@ fun MainScreen(
             composable(Screen.Detail.route) {
                 val dest by viewModel.selectedDestination.collectAsState()
                 val favs by viewModel.favoriteDestinations.collectAsState()
-                val reviews by viewModel.getReviews(dest?.id ?: "").collectAsState(emptyList())
-                DetailScreen(
-                    destination = dest ?: Destination(),
-                    reviews = reviews,
-                    isFavorite = favs.any { f -> f.id == dest?.id },
-                    onFavoriteClick = { dest?.let { viewModel.toggleFavorite(it) } },
-                    onBackClick = { navController.popBackStack() },
-                    onRouteClick = { viewModel.selectDestinationForMap(dest!!); navController.navigate(Screen.Map.route) },
-                    onSaveReview = { viewModel.addReview(it) },
-                    onDeleteReview = { viewModel.deleteReview(it) }
-                )
+
+                // --- PERBAIKAN ERROR MERAH ---
+                dest?.let { selectedDest ->
+                    val reviews by viewModel.getReviews(selectedDest.id).collectAsState(emptyList())
+                    DetailScreen(
+                        destination = selectedDest,
+                        reviews = reviews,
+                        isFavorite = favs.any { f -> f.id == selectedDest.id },
+                        onFavoriteClick = { viewModel.toggleFavorite(selectedDest) },
+                        onBackClick = { navController.popBackStack() },
+                        onRouteClick = {
+                            viewModel.selectDestinationForMap(selectedDest)
+                            navController.navigate(Screen.Map.route)
+                        },
+                        onSaveReview = { viewModel.addReview(it) },
+                        onDeleteReview = { viewModel.deleteReview(it) }
+                    )
+                }
             }
 
             composable(Screen.Profile.route) {
@@ -147,16 +195,20 @@ fun MainScreen(
                     onBackClick = { navController.navigateUp() },
                     isDarkMode = isDarkMode,
                     onDarkModeChange = { themeViewModel.setDarkMode(it) },
+                    isEnglish = isEnglish,
+                    onLanguageChange = { languageViewModel.setLanguage(it) },
                     onEditProfileClick = { navController.navigate(Screen.EditProfile.route) },
                     onLogoutClick = { authViewModel.logout(); navController.navigate(Screen.Login.route) { popUpTo(0) { inclusive = true } } },
                     userName = currentUser?.displayName ?: "Petualang",
                     userEmail = currentUser?.email ?: "",
                     profilePictureUrl = currentUser?.photoUrl?.toString() ?: "",
-                    onPhotoSelected = { authViewModel.uploadProfilePhoto(it) { s, r -> if (s) Toast.makeText(context, "Sukses!", Toast.LENGTH_SHORT).show() } }
+                    // --- PERBAIKAN WARNING KUNING ---
+                    onPhotoSelected = { authViewModel.uploadProfilePhoto(it) { s, _ -> if (s) Toast.makeText(context, "Sukses!", Toast.LENGTH_SHORT).show() } }
                 )
             }
 
             composable(Screen.EditProfile.route) { EditProfileScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }) }
+
             composable(Screen.AllDestinations.route) {
                 AllDestinationsScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }, onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) })
             }
