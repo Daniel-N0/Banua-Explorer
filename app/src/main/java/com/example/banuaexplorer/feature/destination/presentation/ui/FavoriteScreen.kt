@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
-import com.example.banuaexplorer.ui.theme.BackgroundLight
-import com.example.banuaexplorer.ui.theme.BanuaGreen
 
 @Composable
 fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {},
@@ -34,13 +32,13 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundLight)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // --- HEADER (Identik dengan Partner Screen) ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White) // Tetap putih agar bersih
+                .background(MaterialTheme.colorScheme.surface) // Tetap putih agar bersih
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -49,7 +47,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = BanuaGreen,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { onBackClick() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -57,13 +55,13 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                     text = "Destinasi Favorit",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = BanuaGreen
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = BanuaGreen
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -75,7 +73,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
             ) {
                 Text(
                     text = "Belum ada destinasi favorit",
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         } else {
@@ -89,7 +87,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                         Text(
                             "YOUR FAVORITES",
-                            color = Color(0xFFF2C94C),
+                            color = MaterialTheme.colorScheme.tertiary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
                         )
@@ -97,7 +95,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
                             "Destinasi yang Kamu Sukai",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            color = Color(0xFF001F1F)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -124,7 +122,7 @@ fun FavoriteScreen(viewModel: DestinationViewModel, onBackClick: () -> Unit = {}
 fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier.fillMaxWidth()
             .fillMaxWidth()
@@ -141,10 +139,10 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(BanuaGreen.copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = BanuaGreen)
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -155,13 +153,14 @@ fun FavoriteCard(destination: Destination, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = destination.kabupaten, fontSize = 12.sp, color = Color.Gray)
+                    Text(text = destination.kabupaten, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
 

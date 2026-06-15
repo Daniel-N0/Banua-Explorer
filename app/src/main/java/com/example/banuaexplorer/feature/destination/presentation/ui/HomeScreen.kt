@@ -1,7 +1,6 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
 import android.widget.Toast
-import coil.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage // <-- Import untuk menampilkan gambar dari URL
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
@@ -39,7 +39,8 @@ fun HomeScreen(
     viewModel: DestinationViewModel,
     onDestinationClick: (Destination) -> Unit,
     onProfileClick: () -> Unit,
-    onAmbassadorClick: (String) -> Unit,
+    onAmbassadorClick: (Ambassador) -> Unit,
+    onSeeAllAmbassadorClick: () -> Unit,
     onSeeAllClick: () -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
@@ -101,7 +102,8 @@ fun HomeScreen(
 
             AmbassadorSection(
                 ambassadors = ambassadors,
-                onAmbassadorClick = onAmbassadorClick
+                onAmbassadorClick = onAmbassadorClick,
+                onSeeAllClick = onSeeAllAmbassadorClick
             )
         }
 
@@ -234,11 +236,11 @@ fun HomeHeader(
                     contentAlignment = Alignment.Center
                 ) {
                     if (profilePhotoUrl.isNotBlank()) {
-                        coil.compose.AsyncImage(
+                        AsyncImage(
                             model = profilePhotoUrl,
                             contentDescription = "Profil",
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                            contentScale = ContentScale.Crop
                         )
                     } else {
                         Text(
@@ -345,13 +347,14 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
                     val destination = destinations[index]
                     Card(modifier = Modifier.width(220.dp).clickable { onDestinationClick(destination) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                         Column {
+                            // FOTO DESTINASI DARI DATABASE
                             AsyncImage(
-                                model = destination.imageUrl, // Ngambil langsung dari data class lu
+                                model = destination.imageUrl,
                                 contentDescription = destination.name,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(120.dp),
-                                contentScale = ContentScale.Crop // Biar gambar rapi
+                                contentScale = ContentScale.Crop
                             )
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(destination.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
@@ -445,10 +448,7 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
 }
 
 @Composable
-fun AmbassadorSection(
-    ambassadors: List<Ambassador>,
-    onAmbassadorClick: (String) -> Unit // <--- TAMBAHIN (String) DI SINI!
-) {
+fun AmbassadorSection( ambassadors: List<Ambassador>, onAmbassadorClick: (Ambassador) -> Unit, onSeeAllClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
@@ -456,62 +456,64 @@ fun AmbassadorSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Duta Daerah", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-            Text(
-                text = "Lihat Semua",
-                modifier = Modifier.clickable {
-                    // buka halaman semua duta
-                }
-            )
+            Text("Lihat Semua", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable { onSeeAllClick() })
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(ambassadors) { ambassador ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Card(
                     modifier = Modifier
-                        .width(100.dp) // Kasih lebar biar rapi
-                        .clickable { onAmbassadorClick(ambassador.id) } // <--- Bawa ID Duta di sini
+                        .width(130.dp)
+                        .clickable {
+                            onAmbassadorClick(ambassador)
+                        },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-                    // --- FOTO DINAMIS ---
-                    AsyncImage(
-                        model = ambassador.imageUrl,
-                        contentDescription = ambassador.name,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentScale = ContentScale.Crop
-                    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // --- NAMA DINAMIS ---
-                    Text(
-                        text = ambassador.name,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Surface(
-                        color = Color(0xFFFFC107),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.padding(top = 4.dp)
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "DUTA",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+
+                        AsyncImage(
+                            model = ambassador.imageUrl,
+                            contentDescription = ambassador.name,
+                            modifier = Modifier
+                                .size(90.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = ambassador.name,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "Banjarbaru",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(
+                                    horizontal = 8.dp,
+                                    vertical = 2.dp
+                                )
+                            )
+                        }
                     }
                 }
             }

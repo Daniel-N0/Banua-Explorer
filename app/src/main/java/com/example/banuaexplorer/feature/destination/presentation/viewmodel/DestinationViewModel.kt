@@ -1,5 +1,6 @@
 package com.example.banuaexplorer.feature.destination.presentation.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,8 @@ import com.example.banuaexplorer.feature.destination.domain.usecase.DestinationU
 import com.example.banuaexplorer.network.RetrofitClient // Pastikan import ini sesuai
 import com.example.banuaexplorer.network.RouteRequest   // Pastikan import ini sesuai
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,14 +27,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
-
-
 data class UserProfile(
-    val name: String = "Muhammad Ilham",
-    val email: String = "ilham@banua.id",
+    val name: String = "",
+    val email: String = "",
     val phone: String = "",
-    val city: String = "Banjarbaru",
+    val city: String = "",
     val photoUri: String? = null
 )
 
@@ -95,8 +95,13 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val reviews: StateFlow<List<Review>> = _reviews.asStateFlow()
 
-    private val _favoriteDestinations = MutableStateFlow<List<Destination>>(emptyList())
-    val favoriteDestinations: StateFlow<List<Destination>> = _favoriteDestinations.asStateFlow()
+    val favoriteDestinations: StateFlow<List<Destination>> =
+        useCase.getLocalFavorites()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
 
     private val _selectedDestination = MutableStateFlow<Destination?>(null)
     val selectedDestination: StateFlow<Destination?> = _selectedDestination.asStateFlow()
@@ -107,11 +112,19 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _selectedAmbassador = MutableStateFlow<Ambassador?>(null)
+    val selectedAmbassador: StateFlow<Ambassador?> = _selectedAmbassador.asStateFlow()
+
+    fun selectAmbassador(ambassador: Ambassador) {
+        _selectedAmbassador.value = ambassador
+    }
+
 
     init {
         observeLocalData()
         refreshAllData()
         getAmbassadorsFromFirebase()
+        loadCurrentUserProfile()
     }
 
     // ==========================================
@@ -279,13 +292,20 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
 
 
     fun toggleFavorite(destination: Destination) {
-        val currentFavorites = _favoriteDestinations.value.toMutableList()
-        val isAlreadyFavorite = currentFavorites.any { it.id == destination.id }
+        viewModelScope.launch {
 
-        if (isAlreadyFavorite) currentFavorites.removeAll { it.id == destination.id }
-        else currentFavorites.add(destination)
+            val currentFavorites = favoriteDestinations.value
 
-        _favoriteDestinations.value = currentFavorites
+            Log.d("FAVORITE", "Current size = ${currentFavorites.size}")
+
+            if (currentFavorites.any { it.id == destination.id }) {
+                Log.d("FAVORITE", "REMOVE ${destination.name}")
+                useCase.removeFavorite(destination)
+            } else {
+                Log.d("FAVORITE", "SAVE ${destination.name}")
+                useCase.saveFavorite(destination)
+            }
+        }
     }
 
     /**
@@ -319,6 +339,66 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
     fun updateProfile(name: String, email: String, phone: String, city: String, photoUri: String?) {
         _userProfile.value = _userProfile.value.copy(
             name = name, email = email, phone = phone, city = city, photoUri = photoUri
+        )
+    }
+
+    fun getCurrentUserProfile(): UserProfile {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        return UserProfile(
+            name = currentUser?.displayName ?: "",
+            email = currentUser?.email ?: "",
+            phone = "",
+            city = "",
+            photoUri = currentUser?.photoUrl?.toString()
+        )
+    }
+
+    fun saveProfile(
+        name: String,
+        email: String,
+        phone: String,
+        city: String,
+        photoUri: String?
+    ) {
+
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+
+        viewModelScope.launch {
+
+            val request = userProfileChangeRequest {
+                displayName = name
+
+                this.photoUri = photoUri?.let {
+                    Uri.parse(it)
+                }
+            }
+
+            user.updateProfile(request)
+                .addOnSuccessListener {
+                    loadCurrentUserProfile()
+                }
+
+            _userProfile.value = UserProfile(
+                name = name,
+                email = user.email.orEmpty(),
+                phone = phone,
+                city = city,
+                photoUri = photoUri
+            )
+        }
+    }
+
+    fun loadCurrentUserProfile() {
+
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+
+        _userProfile.value = UserProfile(
+            name = user.displayName.orEmpty(),
+            email = user.email.orEmpty(),
+            phone = "",
+            city = "",
+            photoUri = user.photoUrl?.toString()
         )
     }
 

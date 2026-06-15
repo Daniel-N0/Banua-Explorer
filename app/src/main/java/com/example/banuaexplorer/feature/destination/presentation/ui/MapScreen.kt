@@ -193,8 +193,8 @@ fun MapScreen(viewModel: DestinationViewModel) {
                 placeholder = { Text("Cari destinasi di peta...", fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedBorderColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent
                 ),
@@ -222,7 +222,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                     )
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
 
@@ -241,7 +241,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                             text = it.name,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            color = Color(0xFF2B2D42)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -271,7 +271,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                         ) {
                             Text(
                                 text = "Buka di Google Maps",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
@@ -288,12 +288,12 @@ fun MapScreen(viewModel: DestinationViewModel) {
                     ) {
                         Text(
                             text = "Jarak: %.1f km".format(distanceKm),
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp
                         )
                         Text(
                             text = "Estimasi: $durationText",
-                            color = Color(0xFFB8860B), // Warna Saffron Gold yang agak gelap untuk aksen
+                            color = MaterialTheme.colorScheme.tertiary, // Warna Saffron Gold yang agak gelap untuk aksen
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -310,10 +310,10 @@ fun MapScreen(viewModel: DestinationViewModel) {
                 text = "Di Sekitar Anda",
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = Color(0xFF001F1F),
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             )
 
@@ -336,11 +336,11 @@ fun MapScreen(viewModel: DestinationViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .background(Color.White, RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Destinasi tidak ditemukan", color = Color.Gray)
+                    Text(text = "Destinasi tidak ditemukan", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -351,7 +351,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
 fun MapDestinationCard(destination: Destination, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .width(280.dp)
@@ -376,22 +376,23 @@ fun MapDestinationCard(destination: Destination, onClick: () -> Unit) {
                     text = destination.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = destination.kabupaten,
                     fontSize = 11.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Surface(
-                    color = Color(0xFFF2C94C).copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "Arahkan",
-                        color = Color(0xFFB8860B),
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)

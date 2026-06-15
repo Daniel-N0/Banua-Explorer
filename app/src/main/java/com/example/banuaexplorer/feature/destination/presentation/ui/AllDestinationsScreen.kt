@@ -34,8 +34,6 @@ fun AllDestinationsScreen(
     onDestinationClick: (Destination) -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
-    val banuaGreen = Color(0xFF006666)
-    val backgroundGray = Color(0xFFF8F9FA)
 
     // --- STATE FILTER ---
     var searchQuery by remember { mutableStateOf("") }
@@ -66,7 +64,7 @@ fun AllDestinationsScreen(
             // --- HEADER PAKET LENGKAP ---
             Surface(
                 shadowElevation = 8.dp,
-                color = banuaGreen,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
             ) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
@@ -81,7 +79,7 @@ fun AllDestinationsScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .padding(start = 16.dp)
                                 .clip(CircleShape)
@@ -91,7 +89,7 @@ fun AllDestinationsScreen(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Eksplor Wisata Banua",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp
                         )
@@ -103,10 +101,10 @@ fun AllDestinationsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.clickable { expandedRegion = true }
                         ) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(selectedRegion, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.White)
+                            Text(selectedRegion, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                         }
                         DropdownMenu(expanded = expandedRegion, onDismissRequest = { expandedRegion = false }) {
                             regions.forEach { region ->
@@ -123,15 +121,15 @@ fun AllDestinationsScreen(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = { Text("Cari nama tempat...", fontSize = 14.sp) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = banuaGreen) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp, vertical = 8.dp),
                         // .height(50.dp) DIHAPUS agar teks otomatis center
                         shape = RoundedCornerShape(24.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedBorderColor = Color.Transparent,
                             focusedBorderColor = Color.Transparent
                         ),
@@ -160,7 +158,7 @@ fun AllDestinationsScreen(
                                 Surface(
                                     shape = RoundedCornerShape(16.dp),
                                     // Putih solid kalau dipilih, Putih transparan kalau tidak
-                                    color = if (isSelected) Color.White else Color.White.copy(alpha = 0.2f),
+                                    color = if (isSelected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
                                     shadowElevation = if (isSelected) 4.dp else 0.dp,
                                     modifier = Modifier.size(56.dp)
                                 ) {
@@ -168,7 +166,7 @@ fun AllDestinationsScreen(
                                         Text(
                                             text = category.take(1),
                                             // Teks hijau kalau dipilih, Putih kalau tidak
-                                            color = if (isSelected) banuaGreen else Color.White,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 20.sp
                                         )
@@ -180,7 +178,7 @@ fun AllDestinationsScreen(
                                     fontSize = 12.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                                     // Teks bawah harus putih agar kontras dengan background header
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
                         }
@@ -193,12 +191,12 @@ fun AllDestinationsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(backgroundGray)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
             if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Destinasi tidak ditemukan", color = Color.Gray)
+                    Text("Destinasi tidak ditemukan", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             } else {
                 LazyVerticalGrid(
@@ -223,7 +221,7 @@ fun DestinationGridItem(destination: Destination, onClick: (Destination) -> Unit
             .fillMaxWidth()
             .clickable { onClick(destination) },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column {
@@ -232,10 +230,10 @@ fun DestinationGridItem(destination: Destination, onClick: (Destination) -> Unit
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .background(Color(0xFF006666).copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF006666))
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
@@ -243,13 +241,14 @@ fun DestinationGridItem(destination: Destination, onClick: (Destination) -> Unit
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = Color.Gray)
+                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = destination.kabupaten, fontSize = 11.sp, color = Color.Gray, maxLines = 1)
+                    Text(text = destination.kabupaten, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1)
                 }
             }
         }

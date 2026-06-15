@@ -28,6 +28,9 @@ import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +60,10 @@ fun DetailScreen(
     val displayReviews = if (publicReviews.isNotEmpty()) publicReviews else reviews
     val averageRating = if (displayReviews.isNotEmpty()) displayReviews.sumOf { it.rating } / displayReviews.size else 0.0
     val formattedRating = if (averageRating > 0) String.format(java.util.Locale.US, "%.1f", averageRating) else "0.0"
+    val context = LocalContext.current
+    var videoUrls by remember { mutableStateOf<List<String>>(emptyList()) }
+    var instagramUrl by remember { mutableStateOf("") }
+    var whatsappUrl by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundGray)) {
         // --- 1. GAMBAR BACKGROUND (HEADER) ---
@@ -177,6 +184,17 @@ fun DetailScreen(
                                     if (!querySnapshot.isEmpty) {
                                         val urls = querySnapshot.documents[0].get("galleryUrls") as? List<String> ?: emptyList()
                                         realGalleryUrls = urls
+
+                                        // --- TAMBAHIN DUA BARIS INI BRO ---
+                                        val vUrls = querySnapshot.documents[0].get("videoUrls") as? List<String> ?: emptyList()
+                                        videoUrls = vUrls
+                                        // ----------------------------------
+
+                                        instagramUrl =
+                                            querySnapshot.documents[0].getString("instagramUrl") ?: ""
+
+                                        whatsappUrl =
+                                            querySnapshot.documents[0].getString("whatsappUrl") ?: ""
                                     }
                                 }
 
@@ -223,7 +241,15 @@ fun DetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { /* TODO: Buka IG */ },
+                            onClick = {
+                                if (instagramUrl.isNotBlank()) {
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(instagramUrl)
+                                    )
+                                    context.startActivity(intent)
+                                }
+                            },
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = banuaGreen)
@@ -233,7 +259,15 @@ fun DetailScreen(
                             Text("Instagram", fontWeight = FontWeight.SemiBold)
                         }
                         OutlinedButton(
-                            onClick = { /* TODO: Buka WA */ },
+                            onClick = {
+                                if (whatsappUrl.isNotBlank()) {
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(whatsappUrl)
+                                    )
+                                    context.startActivity(intent)
+                                }
+                            },
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = banuaGreen)
@@ -305,20 +339,62 @@ fun DetailScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text("Video Relevan", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(3) {
-                            Box(
-                                modifier = Modifier
-                                    .width(120.dp)
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(Color.DarkGray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), modifier = Modifier.size(40.dp)) {
-                                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(8.dp))
+                    if (videoUrls.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Text(
+                            text = "Video Relevan",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            // Looping otomatis membaca data dari Firebase
+                            items(videoUrls) { url ->
+                                Box(
+                                    modifier = Modifier
+                                        .width(120.dp)
+                                        .height(200.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .clickable {
+                                            // Eksekusi buka link saat Box diklik
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                            context.startActivity(intent)
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // --- 1. GAMBAR BACKGROUND (THUMBNAIL) ---
+                                    // Kita pakai foto destinasi biar nyambung sama halamannya
+                                    AsyncImage(
+                                        model = destination.imageUrl,
+                                        contentDescription = "Thumbnail Video",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+
+                                    // --- 2. OVERLAY GELAP ---
+                                    // Biar gambar destinasinya agak gelap & ikon play-nya kelihatan jelas
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.Black.copy(alpha = 0.4f))
+                                    )
+
+                                    // --- 3. IKON PLAY DI TENGAH ---
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = Color.White.copy(alpha = 0.8f), // Bikin putih transparan biar elegan
+                                        modifier = Modifier.size(44.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.PlayArrow,
+                                            contentDescription = "Play",
+                                            tint = Color.Black, // Play warna hitam biar kontras
+                                            modifier = Modifier.padding(10.dp)
+                                        )
+                                    }
                                 }
                             }
                         }

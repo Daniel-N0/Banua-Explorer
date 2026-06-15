@@ -75,7 +75,7 @@ class DestinationRepositoryImpl(
     }
 
     override suspend fun removeFavorite(destination: Destination) {
-        favoriteDao.deleteFavorite(destination.toFavoriteEntity())
+        favoriteDao.deleteFavoriteById(destination.id)
     }
 
     override fun getReviews(destId: String): Flow<List<Review>> {

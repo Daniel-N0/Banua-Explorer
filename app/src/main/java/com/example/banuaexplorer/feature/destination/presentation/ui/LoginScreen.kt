@@ -4,9 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -16,23 +17,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.banuaexplorer.R
@@ -44,9 +33,6 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit = {},
     onForgotPasswordClick: (String) -> Unit
 ) {
-    val banuaGreen = Color(0xFF005959)
-    val backgroundGray = Color(0xFFFFFFFF)
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -54,7 +40,8 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundGray)
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -62,31 +49,34 @@ fun LoginScreen(
         // --- LOGO ATAU ICON APLIKASI ---
         Box(
             modifier = Modifier
-                .size(150.dp),
+                .size(150.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(24.dp)
+                ),
             contentAlignment = Alignment.Center
         ) {
-            // Nanti bisa diganti pakai Image logo asli BanuaExplorer
             Image(
-                painter = painterResource(id = R.drawable.banua_explorer), // Pakai nama file yang baru
+                painter = painterResource(id = R.drawable.banua_explorer_login),
                 contentDescription = "Logo Banua Explorer",
-                modifier = Modifier.size(150.dp) // Ukuran logonya, bisa lu gede-kecilin
+                modifier = Modifier.size(120.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // --- JUDUL ---
         Text(
             text = "Selamat Datang!",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF001F1F)
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Silakan login untuk menjelajahi keindahan Banua.",
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -99,16 +89,17 @@ fun LoginScreen(
             label = { Text("Email") },
             leadingIcon = {
                 Icon(
-                    Icons.Default.Email,
+                    imageVector = Icons.Default.Email,
                     contentDescription = null,
-                    tint = banuaGreen
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = banuaGreen,
-                focusedLabelColor = banuaGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true
@@ -123,27 +114,27 @@ fun LoginScreen(
             label = { Text("Password") },
             leadingIcon = {
                 Icon(
-                    Icons.Default.Lock,
+                    imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    tint = banuaGreen
+                    tint = MaterialTheme.colorScheme.primary
                 )
             },
             trailingIcon = {
-                val image =
-                    if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = image,
                         contentDescription = "Toggle Password Visibility",
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = banuaGreen,
-                focusedLabelColor = banuaGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
             ),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -156,14 +147,11 @@ fun LoginScreen(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(
-                onClick = { onForgotPasswordClick(email) },
-                modifier = Modifier
-                    .fillMaxWidth() // 1. Bikin wadahnya selebar layar
-                    .wrapContentWidth(Alignment.End) // 2. Dorong tombolnya ke paling kanan
+                onClick = { onForgotPasswordClick(email) }
             ) {
                 Text(
                     text = "Lupa Password?",
-                    color = banuaGreen,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -179,10 +167,17 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = banuaGreen),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Masuk", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(
+                text = "Masuk",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -191,10 +186,13 @@ fun LoginScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Belum punya akun? ", color = Color.Gray)
+            Text(
+                text = "Belum punya akun? ",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(
                 text = "Daftar di sini",
-                color = banuaGreen,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )
