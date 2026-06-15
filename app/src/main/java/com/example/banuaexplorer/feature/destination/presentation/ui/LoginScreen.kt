@@ -63,12 +63,11 @@ fun LoginScreen(
         // --- LOGO ATAU ICON APLIKASI ---
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(150.dp)
                 .background(
                     MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                     RoundedCornerShape(24.dp)
                 ),
-                .size(150.dp),
             contentAlignment = Alignment.Center
         ) {
             // Nanti bisa diganti pakai Image logo asli BanuaExplorer

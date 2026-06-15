@@ -27,6 +27,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 
 
 @Composable
@@ -34,9 +36,12 @@ fun EditProfileScreen(
     viewModel: DestinationViewModel,
     onBackClick: () -> Unit = {}
 ) {
-    val profile by viewModel.userProfile.collectAsState()
 
-    // Nanti pindahkan state ini ke ViewModel
+    val profile by viewModel.userProfile.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.loadCurrentUserProfile()
+    }
+
     var name by remember(profile.name) {
         mutableStateOf(profile.name)
     }
@@ -260,7 +265,7 @@ fun EditProfileScreen(
         ) {
             Button(
                 onClick = {
-                    viewModel.updateProfile(
+                    viewModel.saveProfile(
                         name = name,
                         email = email,
                         phone = phone,

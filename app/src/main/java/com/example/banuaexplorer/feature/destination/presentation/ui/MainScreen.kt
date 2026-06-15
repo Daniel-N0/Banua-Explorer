@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 
 // Import Models & ViewModels
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
+import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.ThemeViewModel
@@ -216,6 +217,14 @@ fun MainScreen(
                     },
                     onProfileClick = { navController.navigate(Screen.Profile.route) },
                     onAmbassadorClick = {
+                        ambassador -> navController.navigate("duta_detail/${ambassador.id}") {
+                            popUpTo(Screen.Home.route) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+
+                    onSeeAllAmbassadorClick = {
                         navController.navigate(Screen.Partner.route) {
                             popUpTo(Screen.Home.route) { saveState = true }
                             launchSingleTop = true
@@ -240,8 +249,13 @@ fun MainScreen(
             composable(Screen.Partner.route) {
                 PartnerScreen(
                     viewModel = viewModel,
+
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+
                     onNavigateToDutaDetail = { id ->
-                        navController.navigate("duta_detail/$id") // <--- Navigasi bawa ID!
+                        navController.navigate("duta_detail/$id")
                     }
                 )
             }
@@ -278,7 +292,7 @@ fun MainScreen(
                 )
 
                 // 2. Ambil data review dari database lokal (ROOM) via ViewModel
-                val currentReviews by viewModel.getReviews(currentDestination.id).collectAsState(initial = emptyList())
+                val currentReviews by viewModel.getReviews(currentDestination.id).collectAsState(initial = emptyList<Review>())
 
                 val isFavorite = favoriteDestinations.any { it.id == currentDestination.id }
 
