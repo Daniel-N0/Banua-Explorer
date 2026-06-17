@@ -22,7 +22,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,8 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.banuaexplorer.R
-import com.example.banuaexplorer.feature.destination.domain.model.Destination
-import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.LanguageViewModel
@@ -147,22 +144,41 @@ fun MainScreen(
                     onProfileClick = { navController.navigate(Screen.Profile.route) },
                     onAmbassadorClick = { navController.navigate("duta_detail/${it.id}") },
                     onSeeAllAmbassadorClick = { navController.navigate(Screen.Partner.route) },
-                    onSeeAllClick = { navController.navigate(Screen.AllDestinations.route) }
+                    onSeeAllClick = { navController.navigate(Screen.AllDestinations.route) },
+                    onTourPackageClick = { packageName -> navController.navigate("tour_detail/$packageName") }
                 )
             }
 
             composable(Screen.Favorite.route) {
-                FavoriteScreen(viewModel = viewModel, onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) })
+                    FavoriteScreen(
+                    viewModel = viewModel,
+                    onBackClick = { navController.popBackStack() },
+                    onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) }
+                )
             }
 
             composable(Screen.Map.route) { MapScreen(viewModel = viewModel) }
 
             composable(Screen.Partner.route) {
-                PartnerScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }, onNavigateToDutaDetail = { navController.navigate("duta_detail/$it") })
+                PartnerScreen(
+                    viewModel = viewModel,
+                    onBackClick = { navController.popBackStack() },
+                    onNavigateToDutaDetail = { navController.navigate("duta_detail/$it") },
+                    // --- PERBAIKAN: Tambahkan aksi navigasi ini ---
+                    onSponsorClick = { navController.navigate("sponsor_detail") }
+                )
             }
 
             composable("duta_detail/{dutaId}") {
                 DutaDetailScreen(ambassadorId = it.arguments?.getString("dutaId") ?: "", onBackClick = { navController.popBackStack() })
+            }
+
+            composable("tour_detail/{packageName}") {
+                TourPackageDetailScreen(onBackClick = { navController.popBackStack() })
+            }
+
+            composable("sponsor_detail") {
+                SponsorDetailScreen(onBackClick = { navController.popBackStack() })
             }
 
             composable(Screen.Detail.route) {

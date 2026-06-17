@@ -12,12 +12,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,26 +38,54 @@ import com.example.banuaexplorer.feature.destination.presentation.viewmodel.Dest
 fun PartnerScreen(
     viewModel: DestinationViewModel,
     onBackClick: () -> Unit,
-    onNavigateToDutaDetail: (String) -> Unit
+    onNavigateToDutaDetail: (String) -> Unit,
+    onSponsorClick: () -> Unit
 ) {
     val partners by viewModel.partners.collectAsState()
     val ambassadors by viewModel.ambassadors.collectAsState()
 
     var selectedGroup by remember { mutableStateOf<String?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    // Setup untuk auto-focus keyboard
+    val focusRequester = remember { FocusRequester() }
+
+    // Otomatis menaikkan keyboard saat isSearchActive = true
+    LaunchedEffect(isSearchActive) {
+        if (isSearchActive) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    val filteredPartners = partners.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
+    }
+
+    val filteredAmbassadorsForSearch = ambassadors.filter {
+        it.name.contains(searchQuery, ignoreCase = true) ||
+                it.kabupaten.contains(searchQuery, ignoreCase = true)
+    }
 
     if (selectedGroup != null) {
-        val filteredAmbassadors = ambassadors.filter { ambassador ->
-            if (selectedGroup == "Duta Kota Banjarmasin") {
-                ambassador.kabupaten.contains("Banjarmasin", ignoreCase = true)
-            } else if (selectedGroup == "Duta Kota Banjarbaru") {
-                ambassador.kabupaten.contains("Banjarbaru", ignoreCase = true)
-            } else {
-                false
+        val filteredAmbassadors =
+            when (selectedGroup) {
+                "ALL" -> ambassadors
+                "Duta Kota Banjarmasin" ->
+                    ambassadors.filter {
+                        it.kabupaten.contains("Banjarmasin", true)
+                    }
+
+                "Duta Kota Banjarbaru" ->
+                    ambassadors.filter {
+                        it.kabupaten.contains("Banjarbaru", true)
+                    }
+
+                else -> emptyList()
             }
-        }
 
         DutaDetailGroupScreen(
-            groupName = selectedGroup!!,
+            groupName = if (selectedGroup == "ALL") stringResource(R.string.seluruh_duta) else selectedGroup!!,
             ambassadorList = filteredAmbassadors,
             onBackClick = { selectedGroup = null },
             onNavigateToDutaDetail = onNavigateToDutaDetail
@@ -63,17 +94,83 @@ fun PartnerScreen(
         Column(
             modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Header Section yang sudah diperbaiki
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable { onBackClick() })
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = stringResource(R.string.partnership_title), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                if (isSearchActive) {
+                    // Tampilan saat Pencarian Aktif
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                isSearchActive = false
+                                searchQuery = ""
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester), // Pemicu Auto-focus
+                            placeholder = { Text(stringResource(R.string.search)) },
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = "Clear",
+                                        modifier = Modifier.clickable { searchQuery = "" }
+                                    )
+                                }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+                    }
+                } else {
+                    // Tampilan Normal (Pencarian Tidak Aktif)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.ArrowBack,
+                                contentDescription = stringResource(R.string.back),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable { onBackClick() }
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = stringResource(R.string.partnership_title),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { isSearchActive = true }
+                        )
+                    }
                 }
-                Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary)
             }
 
             LazyVerticalGrid(
@@ -83,38 +180,103 @@ fun PartnerScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                item(span = { GridItemSpan(2) }) {
-                    Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                        Text(text = stringResource(R.string.collabs_label), color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = stringResource(R.string.membangun_banua), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
-                        Text(text = stringResource(R.string.bersama_mitra), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
-                    }
-                }
-
-                item(span = { GridItemSpan(2) }) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(R.string.duta_daerah), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)
-                        Text(text = stringResource(R.string.lihat_semua), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
-                    }
-                }
-
-                item(span = { GridItemSpan(2) }) {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(bottom = 8.dp)) {
-                        item {
-                            DutaGroupCard(title = "Duta Kota Banjarbaru", subtitle = "Representing the Idaman City", badge = "PUTRA PUTRI PARIWISATA", imageUrl = "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?q=80&w=600", onClick = { selectedGroup = "Duta Kota Banjarbaru" })
-                        }
-                        item {
-                            DutaGroupCard(title = "Duta Kota Banjarmasin", subtitle = "Representing the Thousand River City", badge = "NANANG GALUH", imageUrl = "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80&w=600", onClick = { selectedGroup = "Duta Kota Banjarmasin" })
+                if (searchQuery.isEmpty()) {
+                    item(span = { GridItemSpan(2) }) {
+                        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                            Text(text = stringResource(R.string.collabs_label), color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = stringResource(R.string.membangun_banua), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
+                            Text(text = stringResource(R.string.bersama_mitra), fontWeight = FontWeight.Bold, fontSize = 24.sp, color = MaterialTheme.colorScheme.primary)
                         }
                     }
-                }
 
-                item(span = { GridItemSpan(2) }) {
-                    Text(text = stringResource(R.string.mitra_sponsor), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
-                }
+                    item(span = { GridItemSpan(2) }) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.duta_daerah),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
 
-                items(partners) { SponsorCard(it) }
+                            Text(
+                                text = stringResource(R.string.lihat_semua),
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 12.sp,
+                                modifier = Modifier.clickable {
+                                    selectedGroup = "ALL"
+                                }
+                            )
+                        }
+                    }
+
+                    item(span = { GridItemSpan(2) }) {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(bottom = 8.dp)) {
+                            item {
+                                DutaGroupCard(title = stringResource(R.string.duta_banjarbaru), subtitle = stringResource(R.string.banjarbaru_subtitle), badge = stringResource(R.string.putra_putri_pariwisata), imageUrl = "https://images.unsplash.com/photo-1542640244-7e672d6cef4e?q=80&w=600", onClick = { selectedGroup = "Duta Kota Banjarbaru" })
+                            }
+                            item {
+                                DutaGroupCard(title = stringResource(R.string.duta_banjarmasin), subtitle = stringResource(R.string.banjarmasin_subtitle), badge = stringResource(R.string.nanang_galuh), imageUrl = "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80&w=600", onClick = { selectedGroup = "Duta Kota Banjarmasin" })
+                            }
+                        }
+                    }
+
+                    item(span = { GridItemSpan(2) }) {
+                        Text(text = stringResource(R.string.mitra_sponsor), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+                    }
+
+                    // --- 1. PERBAIKAN: Meneruskan onClick saat pencarian kosong ---
+                    items(partners) { partner ->
+                        SponsorCard(partner = partner, onClick = { onSponsorClick() })
+                    }
+                } else {
+                    // Search Results
+                    if (filteredAmbassadorsForSearch.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = stringResource(R.string.duta_daerah),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                        }
+                        items(filteredAmbassadorsForSearch) { ambassador ->
+                            IndividualAmbassadorCard(ambassador) { onNavigateToDutaDetail(ambassador.id) }
+                        }
+                    }
+
+                    if (filteredPartners.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = stringResource(R.string.mitra_sponsor),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                        }
+                        // --- 2. PERBAIKAN: Meneruskan onClick saat menggunakan pencarian ---
+                        items(filteredPartners) { partner ->
+                            SponsorCard(partner = partner, onClick = { onSponsorClick() })
+                        }
+                    }
+
+                    if (filteredAmbassadorsForSearch.isEmpty() && filteredPartners.isEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = stringResource(R.string.tidak_ada_mitra),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
 
                 item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier.height(100.dp)) }
             }
@@ -126,7 +288,7 @@ fun PartnerScreen(
 fun DutaDetailGroupScreen(groupName: String, ambassadorList: List<Ambassador>, onBackClick: () -> Unit, onNavigateToDutaDetail: (String) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable { onBackClick() })
+            Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable { onBackClick() })
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = groupName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
         }
@@ -174,9 +336,18 @@ fun DutaGroupCard(title: String, subtitle: String, badge: String, imageUrl: Stri
     }
 }
 
+// --- 3. PERBAIKAN: Menambahkan onClick dan fungsi clickable ke Modifier Card ---
 @Composable
-fun SponsorCard(partner: Partner) {
-    Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
+fun SponsorCard(partner: Partner, onClick: () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clickable { onClick() }
+    ) {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             AsyncImage(model = partner.imageUrl, contentDescription = partner.name, modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentScale = ContentScale.Crop)
             Spacer(modifier = Modifier.height(16.dp))

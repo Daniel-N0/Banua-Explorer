@@ -1,6 +1,6 @@
 package com.example.banuaexplorer.feature.destination.presentation.ui
 
-import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -27,11 +28,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.filled.DirectionsBoat
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Ambassador
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -44,7 +50,8 @@ fun HomeScreen(
     onProfileClick: () -> Unit,
     onAmbassadorClick: (Ambassador) -> Unit,
     onSeeAllAmbassadorClick: () -> Unit,
-    onSeeAllClick: () -> Unit
+    onSeeAllClick: () -> Unit,
+    onTourPackageClick: (String) -> Unit
 ) {
     val destinations by viewModel.destinations.collectAsState()
     val ambassadors by viewModel.ambassadors.collectAsState()
@@ -73,12 +80,19 @@ fun HomeScreen(
             DestinationRecommendationSection(destinations = filteredDestinations, onDestinationClick = onDestinationClick, onSeeAllClick = onSeeAllClick)
 
             Spacer(modifier = Modifier.height(32.dp))
+
+            // --- SECTION BANNER OTOMATIS ---
             EventBannerSection()
+
             Spacer(modifier = Modifier.height(32.dp))
 
             val comingSoonFormat = stringResource(id = R.string.detail_coming_soon)
-            TourPackageSection(onPackageClick = { Toast.makeText(context, String.format(comingSoonFormat, it), Toast.LENGTH_SHORT).show() })
-
+            TourPackageSection(
+                onPackageClick = { packageName ->
+                    // Ini akan memicu perpindahan halaman membawa nama paketnya
+                    onTourPackageClick(packageName)
+                }
+            )
             Spacer(modifier = Modifier.height(32.dp))
 
             AmbassadorSection(ambassadors = ambassadors, onAmbassadorClick = onAmbassadorClick, onSeeAllClick = onSeeAllAmbassadorClick)
@@ -141,19 +155,32 @@ fun HomeHeader(onProfileIconClick: () -> Unit, searchQuery: String, onSearchChan
 @Composable
 fun CategorySection(selectedCategory: String?, onCategoryClick: (String) -> Unit) {
     val categories = listOf(
-        "Alam" to R.string.cat_alam,
-        "Budaya" to R.string.cat_budaya,
-        "Kuliner" to R.string.cat_kuliner,
-        "Sejarah" to R.string.cat_sejarah,
-        "Religi" to R.string.cat_religi
+        Triple("Alam", R.string.cat_alam, R.drawable.ic_alam),
+        Triple("Budaya", R.string.cat_budaya, R.drawable.ic_budaya),
+        Triple("Kuliner", R.string.cat_kuliner, R.drawable.ic_kuliner),
+        Triple("Sejarah", R.string.cat_sejarah, R.drawable.ic_sejarah),
+        Triple("Religi", R.string.cat_religi, R.drawable.ic_religi)
     )
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        categories.forEach { (categoryKey, stringResId) ->
+        categories.forEach { (categoryKey, stringResId, iconResId) ->
             val isSelected = categoryKey == selectedCategory
             val categoryLabel = stringResource(id = stringResId)
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCategoryClick(categoryKey) }) {
                 Surface(shape = RoundedCornerShape(16.dp), color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface, shadowElevation = 2.dp, modifier = Modifier.size(56.dp)) {
-                    Box(contentAlignment = Alignment.Center) { Text(text = categoryLabel.take(1), color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 20.sp) }
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = iconResId),
+                            contentDescription = categoryKey,
+                            tint =
+                                if (isSelected)
+                                    MaterialTheme.colorScheme.onPrimary
+                                else
+                                    MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = categoryLabel, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
@@ -188,30 +215,118 @@ fun DestinationRecommendationSection(destinations: List<Destination>, onDestinat
     }
 }
 
+// --- PERBAIKAN: EventBannerSection yang bisa Auto-Scroll ---
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventBannerSection() {
-    val dummyEvents = listOf(EventItem("Festival Pasar Terapung 2026", "Siring Menara Pandang", "COMING SOON"), EventItem("Pesona Budaya Banjar", "Taman Budaya Kalsel", "HARI INI"))
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(id = R.string.upcoming_events), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(horizontal = 24.dp))
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) { items(dummyEvents) { EventCard(it) } }
-    }
-}
+    val dummyEvents = listOf(
+        EventItem("Festival Pasar Terapung", "Siring Menara Pandang", "COMING SOON", "https://images.unsplash.com/photo-1655283687311-f90476583284?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+        EventItem("Pesona Budaya Banjar", "Taman Budaya Kalsel", "HARI INI", "https://images.unsplash.com/photo-1689954088471-1760a666774d?q=80&w=1922&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"),
+        EventItem("Banjarmasin Sasirangan Festival", "Siring 0 Kilometer", "MINGGU DEPAN", "https://images.unsplash.com/photo-1761789672627-c916c8464412?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+    )
 
-@Composable
-fun EventCard(event: EventItem) {
-    Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.primary, modifier = Modifier.width(280.dp).height(100.dp)) {
-        Row(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(event.title, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 2)
-                Text(event.location, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f), fontSize = 11.sp, maxLines = 1)
+    if (dummyEvents.isEmpty()) return
+
+    // 1. Gunakan angka besar yang AMAN bagi memori Android (misal: 3000 halaman)
+    val totalSafePages = dummyEvents.size * 1000
+
+    // 2. Mulai dari tengah-tengah (halaman ke-1500), agar user bisa langsung geser ke kiri maupun kanan
+    val startPage = totalSafePages / 2
+
+    val pagerState = rememberPagerState(
+        initialPage = startPage,
+        pageCount = { totalSafePages }
+    )
+
+    // 3. Efek Auto-Scroll
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(3000) // Geser otomatis setiap 3 detik
+
+            // Pengaman ekstra: Jika user benar-benar manteng sampai ujung, kembalikan ke tengah diam-diam
+            if (pagerState.currentPage < totalSafePages - 1) {
+                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            } else {
+                pagerState.scrollToPage(startPage)
             }
-            Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFC107)) { Text(event.status, color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(8.dp, 6.dp)) }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            stringResource(id = R.string.upcoming_events),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            pageSpacing = 16.dp,
+            modifier = Modifier.fillMaxWidth()
+        ) { page ->
+            // 4. Trik Modulo: Mengubah index ratusan/ribuan menjadi 0, 1, atau 2
+            val actualIndex = page % dummyEvents.size
+            EventBannerCard(dummyEvents[actualIndex])
         }
     }
 }
 
-data class EventItem(val title: String, val location: String, val status: String)
+@Composable
+fun EventBannerCard(event: EventItem) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp) // Ukuran banner lebih lebar dan tinggi
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Gambar Background
+            AsyncImage(
+                model = event.imageUrl,
+                contentDescription = event.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Efek Gradasi Gelap (Agar teks putih tetap terbaca meski gambarnya terang)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
+                            startY = 50f // Gradien dimulai dari tengah ke bawah
+                        )
+                    )
+            )
+
+            // Teks dan Status di atas gradasi
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(event.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 2)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(event.location, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp, maxLines = 1)
+                }
+                Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.tertiary) {
+                    Text(event.status, color = MaterialTheme.colorScheme.onTertiary, fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.padding(8.dp, 6.dp))
+                }
+            }
+        }
+    }
+}
+
+data class EventItem(val title: String, val location: String, val status: String, val imageUrl: String) // Model diperbarui
 
 @Composable
 fun TourPackageSection(onPackageClick: (String) -> Unit) {
@@ -222,7 +337,7 @@ fun TourPackageSection(onPackageClick: (String) -> Unit) {
         LazyRow(contentPadding = PaddingValues(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) { items(pkgs.size) { i ->
             Card(modifier = Modifier.width(260.dp).clickable { onPackageClick(pkgs[i].first) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                 Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) { Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary) }
+                    Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) { Icon(Icons.Default.DirectionsBoat, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary) }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(pkgs[i].first, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -249,7 +364,15 @@ fun AmbassadorSection(ambassadors: List<Ambassador>, onAmbassadorClick: (Ambassa
                         AsyncImage(model = ambassador.imageUrl, contentDescription = ambassador.name, modifier = Modifier.size(90.dp).clip(CircleShape), contentScale = ContentScale.Crop)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(ambassador.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface)
-                        Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp)) { Text("Banjarbaru", color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(8.dp, 2.dp)) }
+
+                        Surface(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+                            Text(
+                                text = ambassador.kabupaten.ifBlank { "DUTA" },
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(8.dp, 2.dp)
+                            )
+                        }
                     }
                 }
             }

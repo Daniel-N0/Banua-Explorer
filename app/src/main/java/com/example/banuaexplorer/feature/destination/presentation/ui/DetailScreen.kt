@@ -121,7 +121,7 @@ fun DetailScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
-                                Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFF9800), modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "$formattedRating/5",
@@ -247,7 +247,7 @@ fun DetailScreen(
                                         Icon(
                                             imageVector = Icons.Default.Star,
                                             contentDescription = null,
-                                            tint = if (i <= kotlin.math.round(averageRating).toInt()) Color(0xFFFFC107) else Color.LightGray,
+                                            tint = if (i <= kotlin.math.round(averageRating).toInt()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                                             modifier = Modifier.size(14.dp)
                                         )
                                     }
@@ -390,7 +390,7 @@ fun ReviewCardUI(review: Review, activeUserName: String, onEdit: () -> Unit, onD
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 for (i in 1..5) {
-                    Icon(Icons.Default.Star, contentDescription = null, tint = if (i <= review.rating.toInt()) Color(0xFFFFC107) else Color.LightGray, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.Star, contentDescription = null, tint = if (i <= review.rating.toInt()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f), modifier = Modifier.size(14.dp))
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
@@ -418,7 +418,7 @@ fun ReviewInputDialog(
                     for (i in 1..5) {
                         Icon(
                             imageVector = Icons.Default.Star, contentDescription = null,
-                            tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
+                            tint = if (i <= rating) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                             modifier = Modifier.size(36.dp).clickable { rating = i.toDouble() }.padding(4.dp)
                         )
                     }
