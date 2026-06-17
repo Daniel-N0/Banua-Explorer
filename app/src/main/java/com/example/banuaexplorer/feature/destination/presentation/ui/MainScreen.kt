@@ -8,8 +8,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -71,15 +70,39 @@ fun MainScreen(
             popExitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
             composable(Screen.Splash.route) {
+
                 val currentUser by authViewModel.currentUser.collectAsState()
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(1500)
-                    if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                    else navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                }
-                Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
-                    Image(painter = painterResource(id = R.drawable.banua_explorer), contentDescription = null, modifier = Modifier.size(300.dp))
-                }
+
+                android.util.Log.d(
+                    "SPLASH_THEME",
+                    "isDarkMode = $isDarkMode"
+                )
+                SplashVideoScreen(
+                    videoResId =
+                        if (isDarkMode)
+                            R.raw.dark_mode
+                        else
+                            R.raw.light_mode,
+                    onVideoFinished = {
+
+                        if (currentUser != null) {
+
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Splash.route) {
+                                    inclusive = true
+                                }
+                            }
+
+                        } else {
+
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Splash.route) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+                )
             }
 
             composable(Screen.Login.route) {
