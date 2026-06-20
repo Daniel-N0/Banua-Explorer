@@ -15,7 +15,7 @@ Tambahkan screenshot aplikasi pada folder `screenshots/`.
 
 | Home | Maps | Detail | Profile |
 |------|------|--------|---------|
-| ![alt text](image-1.JPG) | ![alt text](image-2.png) | ![alt text](image-3.png) | ![alt text](image-4.png) |
+| ![alt text](Dokumentasi/image-1.jpg) | ![alt text](Dokumentasi/image-2.png) | ![alt text](Dokumentasi/image-3.png) | ![alt text](Dokumentasi/image-4.png) |
 
 ---
 
