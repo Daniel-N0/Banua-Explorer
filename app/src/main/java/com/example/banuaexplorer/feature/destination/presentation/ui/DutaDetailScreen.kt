@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -102,7 +101,7 @@ fun DutaDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Box(
-                modifier = Modifier.size(160.dp).clip(CircleShape).background(Color.LightGray),
+                modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (imageUrl.isNotEmpty()) {
@@ -158,7 +157,7 @@ fun DutaDetailScreen(
 fun ProfileStatItem(value: String, label: String, icon: ImageVector) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = Color(0xFFFFC107), modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(4.dp))
             Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
         }

@@ -8,8 +8,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,10 +22,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -35,8 +33,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.banuaexplorer.R
-import com.example.banuaexplorer.feature.destination.domain.model.Destination
-import com.example.banuaexplorer.feature.destination.domain.model.Review
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.AuthViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.DestinationViewModel
 import com.example.banuaexplorer.feature.destination.presentation.viewmodel.LanguageViewModel
@@ -74,15 +70,39 @@ fun MainScreen(
             popExitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
             composable(Screen.Splash.route) {
+
                 val currentUser by authViewModel.currentUser.collectAsState()
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(1500)
-                    if (currentUser != null) navController.navigate(Screen.Home.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                    else navController.navigate(Screen.Login.route) { popUpTo(Screen.Splash.route) { inclusive = true } }
-                }
-                Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
-                    Image(painter = painterResource(id = R.drawable.banua_explorer), contentDescription = null, modifier = Modifier.size(300.dp))
-                }
+
+                android.util.Log.d(
+                    "SPLASH_THEME",
+                    "isDarkMode = $isDarkMode"
+                )
+                SplashVideoScreen(
+                    videoResId =
+                        if (isDarkMode)
+                            R.raw.dark_mode
+                        else
+                            R.raw.light_mode,
+                    onVideoFinished = {
+
+                        if (currentUser != null) {
+
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Splash.route) {
+                                    inclusive = true
+                                }
+                            }
+
+                        } else {
+
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Splash.route) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+                )
             }
 
             composable(Screen.Login.route) {
@@ -147,22 +167,41 @@ fun MainScreen(
                     onProfileClick = { navController.navigate(Screen.Profile.route) },
                     onAmbassadorClick = { navController.navigate("duta_detail/${it.id}") },
                     onSeeAllAmbassadorClick = { navController.navigate(Screen.Partner.route) },
-                    onSeeAllClick = { navController.navigate(Screen.AllDestinations.route) }
+                    onSeeAllClick = { navController.navigate(Screen.AllDestinations.route) },
+                    onTourPackageClick = { packageName -> navController.navigate("tour_detail/$packageName") }
                 )
             }
 
             composable(Screen.Favorite.route) {
-                FavoriteScreen(viewModel = viewModel, onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) })
+                    FavoriteScreen(
+                    viewModel = viewModel,
+                    onBackClick = { navController.popBackStack() },
+                    onDestinationClick = { viewModel.selectDestination(it); navController.navigate(Screen.Detail.route) }
+                )
             }
 
             composable(Screen.Map.route) { MapScreen(viewModel = viewModel) }
 
             composable(Screen.Partner.route) {
-                PartnerScreen(viewModel = viewModel, onBackClick = { navController.popBackStack() }, onNavigateToDutaDetail = { navController.navigate("duta_detail/$it") })
+                PartnerScreen(
+                    viewModel = viewModel,
+                    onBackClick = { navController.popBackStack() },
+                    onNavigateToDutaDetail = { navController.navigate("duta_detail/$it") },
+                    // --- PERBAIKAN: Tambahkan aksi navigasi ini ---
+                    onSponsorClick = { navController.navigate("sponsor_detail") }
+                )
             }
 
             composable("duta_detail/{dutaId}") {
                 DutaDetailScreen(ambassadorId = it.arguments?.getString("dutaId") ?: "", onBackClick = { navController.popBackStack() })
+            }
+
+            composable("tour_detail/{packageName}") {
+                TourPackageDetailScreen(onBackClick = { navController.popBackStack() })
+            }
+
+            composable("sponsor_detail") {
+                SponsorDetailScreen(onBackClick = { navController.popBackStack() })
             }
 
             composable(Screen.Detail.route) {

@@ -22,12 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
 import com.example.banuaexplorer.BuildConfig
 import com.example.banuaexplorer.R
 import com.example.banuaexplorer.feature.destination.domain.model.Destination
@@ -39,15 +41,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 @Composable
 fun MapScreen(viewModel: DestinationViewModel) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val destinations by viewModel.destinations.collectAsState()
     val filteredDestinations by viewModel.filteredDestinations.collectAsState()
@@ -71,7 +75,15 @@ fun MapScreen(viewModel: DestinationViewModel) {
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(-3.4413, 114.8295), 11f)
+        val initialLatLng = userLocation?.let { LatLng(it.latitude, it.longitude) } ?: LatLng(-3.4413, 114.8295)
+        position = CameraPosition.fromLatLngZoom(initialLatLng, if (userLocation != null) 15f else 11f)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.clearMapState()
+            viewModel.onSearchQueryChange("")
+        }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -81,7 +93,9 @@ fun MapScreen(viewModel: DestinationViewModel) {
         if (granted) {
             getCurrentLocation(context) { lat, lng ->
                 viewModel.updateUserLocation(lat, lng)
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(lat, lng), 15f)
+                coroutineScope.launch {
+                    cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 15f))
+                }
             }
         }
     }
@@ -90,9 +104,11 @@ fun MapScreen(viewModel: DestinationViewModel) {
         if (routePoints.isNotEmpty()) {
             val builder = LatLngBounds.Builder()
             routePoints.forEach { builder.include(it) }
-            cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(builder.build(), 150))
         }
     }
+
+    val selectedDestination by viewModel.selectedMapDestination.collectAsState()
 
     LaunchedEffect(isLocationGranted) {
         val hasPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -100,17 +116,22 @@ fun MapScreen(viewModel: DestinationViewModel) {
         if (hasPermission) {
             getCurrentLocation(context) { lat, lng ->
                 viewModel.updateUserLocation(lat, lng)
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(lat, lng), 15f)
+                if (selectedDestination == null && routePoints.isEmpty()) {
+                    coroutineScope.launch {
+                        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 15f))
+                    }
+                }
             }
         } else {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    val selectedDestination by viewModel.selectedMapDestination.collectAsState()
     LaunchedEffect(selectedDestination) {
         selectedDestination?.let { dest ->
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f)
+            if (routePoints.isEmpty()) {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f))
+            }
         }
     }
 
@@ -123,16 +144,36 @@ fun MapScreen(viewModel: DestinationViewModel) {
     LaunchedEffect(searchQuery, filteredDestinations) {
         if (searchQuery.isNotBlank() && filteredDestinations.size == 1) {
             val dest = filteredDestinations.first()
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f)
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(LatLng(dest.latitude, dest.longitude), 16f))
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState, properties = MapProperties(isMyLocationEnabled = isLocationGranted)) {
             destinations.forEach { destination ->
-                Marker(state = MarkerState(position = LatLng(destination.latitude, destination.longitude)), title = destination.name, snippet = destination.kabupaten)
+                MarkerInfoWindow(
+                    state = MarkerState(
+                        position = LatLng(
+                            destination.latitude,
+                            destination.longitude
+                        )
+                    ),
+                    title = destination.name,
+                    snippet = destination.kabupaten,
+                    onClick = {
+                        viewModel.selectDestinationForMap(destination)
+                        false
+                    }
+                )
             }
-            if (routePoints.isNotEmpty()) { Polyline(points = routePoints, color = MaterialTheme.colorScheme.primary, width = 12f) }
+
+            if (routePoints.isNotEmpty()) {
+                Polyline(
+                    points = routePoints,
+                    color = MaterialTheme.colorScheme.primary,
+                    width = 12f
+                )
+            }
         }
 
         Row(modifier = Modifier.fillMaxWidth().padding(top = 40.dp, start = 24.dp, end = 24.dp).align(Alignment.TopCenter), verticalAlignment = Alignment.CenterVertically) {
@@ -179,7 +220,7 @@ fun MapScreen(viewModel: DestinationViewModel) {
                     items(filteredDestinations) { dest -> MapDestinationCard(dest, onClick = { viewModel.selectDestinationForMap(dest) }) }
                 }
             } else if (searchQuery.isNotBlank()) {
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)).padding(16.dp), contentAlignment = Alignment.Center) { Text(text = stringResource(R.string.destinasi_tidak_ditemukan), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp)).padding(16.dp), contentAlignment = Alignment.Center) { Text(text = stringResource(R.string.no_destinations), color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         }
     }
@@ -189,7 +230,14 @@ fun MapScreen(viewModel: DestinationViewModel) {
 fun MapDestinationCard(destination: Destination, onClick: () -> Unit) {
     Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), modifier = Modifier.width(280.dp).clickable { onClick() }) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)), contentAlignment = Alignment.Center) { Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+            AsyncImage(
+                model = destination.imageUrl,
+                contentDescription = destination.name,
+                modifier = Modifier
+                    .size(70.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = destination.name, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)

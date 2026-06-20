@@ -53,7 +53,7 @@ fun LoginScreen(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(R.drawable.banua_explorer),
+                painter = painterResource(R.drawable.banua_explorer_login),
                 contentDescription = null,
                 modifier = Modifier.size(150.dp)
             )
@@ -140,7 +140,7 @@ fun LoginScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.belum_punya_akun), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
-                text = stringResource(R.string.daftar_di_sini),
+                text = " " + stringResource(R.string.daftar_di_sini),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToRegister() }

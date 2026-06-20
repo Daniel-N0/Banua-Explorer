@@ -59,7 +59,7 @@ fun EditProfileScreen(
         ) {
             Icon(Icons.Default.ArrowBack, contentDescription = "Kembali", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable { onBackClick() })
             Spacer(modifier = Modifier.width(16.dp))
-            Text(stringResource(R.string.edit_profil), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.edit_profile), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
         }
 
         Column(

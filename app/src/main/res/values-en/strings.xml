@@ -60,6 +60,7 @@
     <string name="stat_pengikut">Followers</string>
     <string name="tentang">About</string>
     <string name="kunjungi_instagram">Visit Instagram</string>
+    <string name="tidak_ada_mitra">Partner not found </string>
 
     <string name="destinasi_favorit">Favorite Destinations</string>
     <string name="belum_ada_favorit">No favorite destinations yet</string>
@@ -67,8 +68,7 @@
     <string name="destinasi_disukai">Destinations You Like</string>
 
     <string name="eksplor_wisata">Explore Banua Tourism</string>
-    <string name="cari_nama_tempat">Search places...</string>
-    <string name="destinasi_tidak_ditemukan">Destination not found</string>
+
 
     <string name="cari_di_peta">Search destinations on map...</string>
     <string name="informasi_perjalanan">Trip Information</string>
@@ -96,7 +96,6 @@
     <string name="sudah_punya_akun">Already have an account? </string>
     <string name="login_di_sini">Log in here</string>
 
-    <string name="edit_profil">Edit Profile</string>
     <string name="nomor_telepon">Phone Number</string>
     <string name="kabupaten_kota">City/Regency</string>
     <string name="simpan_perubahan">Save Changes</string>
@@ -110,4 +109,38 @@
     <string name="cat_kuliner">Culinary</string>
     <string name="cat_sejarah">History</string>
     <string name="cat_religi">Religious</string>
+
+    <string name="duta_banjarbaru">Banjarbaru Tourism Ambassador</string>
+    <string name="duta_banjarmasin">Banjarmasin Tourism Ambassador</string>
+
+    <string name="banjarbaru_subtitle">Representing the Idaman City</string>
+    <string name="banjarmasin_subtitle">Representing the Thousand River City</string>
+    <string name="seluruh_duta">All Local Ambassadors</string>
+    <string name="putra_putri_pariwisata">TOURISM AMBASSADOR</string>
+    <string name="nanang_galuh">NANANG GALUH</string>
+
+    <string name="back">Back</string>
+    <string name="search">Search</string>
+    <string name="clear_text">Clear text</string>
+    <string name="remove_from_favorite">Remove from Favorites</string>
+
+    <string name="tour_package_detail_title">3 Days 2 Nights Susur Loksado</string>
+    <string name="mulai_dari">Starting from </string>
+    <string name="price_format"> Rp %s</string>
+    <string name="per_pax"> / pax</string>
+    <string name="itinerary_include">Itinerary &amp; Include</string>
+    <string name="tour_package_desc">Enjoy an unforgettable adventure along the Amandit River with a traditional bamboo raft. This package includes accommodation in a riverside cottage, round-trip transportation from Banjarmasin, and trekking gear for the charming Haratai Waterfall.</string>
+    <string name="total_harga">TOTAL PRICE</string>
+    <string name="booking">Booking</string>
+    <string name="rare_find_badge">4.9</string>
+    <string name="opening_booking_app">Opening Booking App...</string>
+
+    <!-- Sponsor Detail Strings -->
+    <string name="sponsor_detail_subtitle">Sponsorship Detail</string>
+    <string name="sponsor_utama_badge">MAIN SPONSOR</string>
+    <string name="sponsor_bank_kalsel_desc">Bank Kalsel is a Regional Development Bank committed to encouraging South Kalimantan\'s economic growth. Through sustainable MSME empowerment and various strategic CSR programs, we strive to preserve Banua\'s cultural heritage while being a driving force for local community welfare.</string>
+    <string name="website_resmi">OFFICIAL WEBSITE</string>
+    <string name="layanan_nasabah">CUSTOMER SERVICE</string>
+    <string name="email_korporasi">CORPORATE EMAIL</string>
 </resources>
+

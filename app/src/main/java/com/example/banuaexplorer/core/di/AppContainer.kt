@@ -19,7 +19,7 @@ class AppContainer(private val context: Context) {
     private val firestore = FirebaseFirestore.getInstance()
     private val firebaseAuth = FirebaseAuth.getInstance()
 
-    // 2. Inisialisasi API (Pipa penyedot)
+    // 2. Inisialisasi API
     private val destinationApi = DestinationApi(firestore)
     private val partnerApi = PartnerApi(firestore)
 

@@ -51,9 +51,15 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
     private val _selectedMapDestination = MutableStateFlow<Destination?>(null)
     val selectedMapDestination: StateFlow<Destination?> = _selectedMapDestination.asStateFlow()
 
-    // --- STATE PENCARIAN (MAP) ---
+    // --- STATE PENCARIAN & FILTER ---
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _selectedRegion = MutableStateFlow("Kalimantan Selatan")
+    val selectedRegion: StateFlow<String> = _selectedRegion.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow<String?>(null)
+    val selectedCategory: StateFlow<String?> = _selectedCategory.asStateFlow()
 
     // --- STATE RUTE ORS (BARU: BEST PRACTICE) ---
     private val _routePoints = MutableStateFlow<List<LatLng>>(emptyList())
@@ -137,8 +143,11 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
         _userLocation.value = LatLng(lat, lng)
     }
 
-    fun clearUserLocation() {
-        _userLocation.value = null
+    fun clearMapState() {
+        _selectedMapDestination.value = null
+        _routePoints.value = emptyList()
+        _routeDistance.value = 0.0
+        _routeDuration.value = 0.0
     }
 
     fun updateLocationPermissionStatus(isGranted: Boolean) {
@@ -147,6 +156,14 @@ class DestinationViewModel(private val useCase: DestinationUseCase) : ViewModel(
 
     fun onSearchQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
+    }
+
+    fun onRegionSelect(region: String) {
+        _selectedRegion.value = region
+    }
+
+    fun onCategorySelect(category: String?) {
+        _selectedCategory.value = category
     }
 
     fun selectDestinationForMap(destination: Destination) {

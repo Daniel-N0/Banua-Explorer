@@ -51,6 +51,7 @@
     <string name="duta_pariwisata_kebudayaan">Duta Pariwisata &amp; Kebudayaan</string>
     <string name="followers_count">%s Pengikut</string>
     <string name="lihat_bio">Lihat Bio</string>
+    <string name="tidak_ada_mitra"> Mitra tidak ditemukan</string>
 
     <string name="profil_duta">Profil Duta</string>
     <string name="tidak_ada_nama">Nama tidak tersedia</string>
@@ -67,8 +68,7 @@
     <string name="destinasi_disukai">Destinasi yang Anda Sukai</string>
 
     <string name="eksplor_wisata">Jelajahi Wisata Banua</string>
-    <string name="cari_nama_tempat">Cari tempat...</string>
-    <string name="destinasi_tidak_ditemukan">Destinasi tidak ditemukan</string>
+
 
     <string name="cari_di_peta">Cari destinasi di peta...</string>
     <string name="informasi_perjalanan">Informasi Perjalanan</string>
@@ -96,7 +96,6 @@
     <string name="sudah_punya_akun">Sudah punya akun? </string>
     <string name="login_di_sini">Masuk di sini</string>
 
-    <string name="edit_profil">Ubah Profil</string>
     <string name="nomor_telepon">Nomor Telepon</string>
     <string name="kabupaten_kota">Kabupaten/Kota</string>
     <string name="simpan_perubahan">Simpan Perubahan</string>
@@ -110,4 +109,37 @@
     <string name="cat_kuliner">Kuliner</string>
     <string name="cat_sejarah">Sejarah</string>
     <string name="cat_religi">Religi</string>
+
+    <string name="duta_banjarbaru">Duta Kota Banjarbaru</string>
+    <string name="duta_banjarmasin">Duta Kota Banjarmasin</string>
+    <string name="seluruh_duta">Seluruh Duta Daerah</string>
+    <string name="banjarbaru_subtitle">Representing the Idaman City</string>
+    <string name="banjarmasin_subtitle">Representing the Thousand River City</string>
+    <string name="putra_putri_pariwisata">PUTRA PUTRI PARIWISATA</string>
+    <string name="nanang_galuh">NANANG GALUH</string>
+
+    <string name="back">Kembali</string>
+    <string name="search">Cari</string>
+    <string name="clear_text">Hapus teks</string>
+    <string name="remove_from_favorite">Hapus dari Favorit</string>
+
+    <string name="tour_package_detail_title">3 Hari 2 Malam Susur Loksado</string>
+    <string name="mulai_dari">Mulai dari </string>
+    <string name="price_format"> Rp %s</string>
+    <string name="per_pax"> / pax</string>
+    <string name="itinerary_include">Itinerary &amp; Include</string>
+    <string name="tour_package_desc">Nikmati petualangan tak terlupakan menyusuri aliran Sungai Amandit dengan rakit bambu tradisional. Paket ini sudah termasuk penginapan di cottage tepi sungai, transportasi PP dari Banjarmasin, serta perlengkapan trekking menuju Air Terjun Haratai yang menawan.</string>
+    <string name="total_harga">TOTAL HARGA</string>
+    <string name="booking">Booking</string>
+    <string name="rare_find_badge">4.9</string>
+    <string name="opening_booking_app">Membuka Aplikasi Pemesanan...</string>
+
+    <!-- Sponsor Detail Strings -->
+    <string name="sponsor_detail_subtitle">Detail Sponsorship</string>
+    <string name="sponsor_utama_badge">SPONSOR UTAMA</string>
+    <string name="sponsor_bank_kalsel_desc">Bank Kalsel adalah Bank Pembangunan Daerah yang berkomitmen mendorong pertumbuhan ekonomi Kalimantan Selatan. Melalui pemberdayaan UMKM yang berkelanjutan dan berbagai program CSR strategis, kami berupaya melestarikan warisan budaya Banua sekaligus menjadi motor penggerak kesejahteraan masyarakat lokal.</string>
+    <string name="website_resmi">WEBSITE RESMI</string>
+    <string name="layanan_nasabah">LAYANAN NASABAH</string>
+    <string name="email_korporasi">EMAIL KORPORASI</string>
 </resources>
+
